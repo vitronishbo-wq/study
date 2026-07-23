@@ -25,6 +25,7 @@ interface SidebarProps {
   onToggleTheme: () => void;
   explorerOpen: boolean;
   onToggleExplorer: () => void;
+  onOpenStatsModal?: () => void;
 }
 
 const MODULE_ICONS: Record<string, React.ReactNode> = {
@@ -42,7 +43,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
   theme,
   onToggleTheme,
   explorerOpen,
-  onToggleExplorer
+  onToggleExplorer,
+  onOpenStatsModal
 }) => {
   const isDark = theme === 'dark';
   const isSepia = theme === 'sepia';
@@ -252,6 +254,21 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <Award className="w-5 h-5 text-amber-500" />
               </div>
             </div>
+
+            {/* Button to open full StudyStatsModal with Donut Charts */}
+            {onOpenStatsModal && (
+              <button
+                id="btn-open-full-stats-modal"
+                onClick={() => {
+                  setShowStats(false);
+                  onOpenStatsModal();
+                }}
+                className="w-full mb-3 py-2 px-3 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs shadow-xs transition-all flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <BarChart2 className="w-4 h-4" />
+                Painel Completo (Gráficos de Rosca)
+              </button>
+            )}
 
             {/* Global Progress Bar Track */}
             <div className="w-full bg-neutral-200 dark:bg-neutral-800 h-2 rounded-full overflow-hidden mb-4">

@@ -1,8 +1,11 @@
 import express from "express";
 import path from "path";
+import fs from "fs";
 import dotenv from "dotenv";
 import { createServer as createViteServer } from "vite";
 import { GoogleGenAI, Type } from "@google/genai";
+import { initializeApp, cert, getApps } from "firebase-admin/app";
+import { getFirestore } from "firebase-admin/firestore";
 
 dotenv.config();
 
@@ -11,12 +14,85 @@ const PORT = 3000;
 
 app.use(express.json());
 
+// Lazy Firebase Firestore initialization helper
+let dbInstance: ReturnType<typeof getFirestore> | null = null;
+
+function getFirestoreDb() {
+  if (dbInstance) return dbInstance;
+  if (getApps().length > 0) {
+    dbInstance = getFirestore();
+    return dbInstance;
+  }
+
+  try {
+    let credential;
+    if (process.env.FIREBASE_PROJECT_ID && process.env.FIREBASE_CLIENT_EMAIL && process.env.FIREBASE_PRIVATE_KEY) {
+      const privateKey = process.env.FIREBASE_PRIVATE_KEY.replace(/^"|"$/g, '').replace(/\\n/g, '\n');
+      credential = cert({
+        projectId: process.env.FIREBASE_PROJECT_ID,
+        clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+        privateKey: privateKey,
+      });
+    } else if (process.env.FIREBASE_SERVICE_ACCOUNT) {
+      const serviceAccount = typeof process.env.FIREBASE_SERVICE_ACCOUNT === 'string'
+        ? JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT)
+        : process.env.FIREBASE_SERVICE_ACCOUNT;
+      credential = cert(serviceAccount);
+    } else {
+      const filePath = path.join(process.cwd(), "firebase-credentials.json");
+      if (fs.existsSync(filePath)) {
+        const serviceAccount = JSON.parse(fs.readFileSync(filePath, "utf8"));
+        credential = cert(serviceAccount);
+      }
+    }
+
+    if (credential) {
+      initializeApp({ credential });
+      dbInstance = getFirestore();
+      console.log("🔥 Firebase Admin inicializado com sucesso!");
+      return dbInstance;
+    }
+  } catch (err) {
+    console.error("Erro ao inicializar Firebase Admin:", err);
+  }
+  return null;
+}
+
 const ai = new GoogleGenAI({
   apiKey: process.env.GEMINI_API_KEY,
   httpOptions: {
     headers: {
       'User-Agent': 'aistudio-build',
     }
+  }
+});
+
+// Endpoint de diagnóstico do Firebase Firestore
+app.get("/api/firebase/status", async (req, res) => {
+  try {
+    const db = getFirestoreDb();
+    if (!db) {
+      return res.status(503).json({
+        connected: false,
+        message: "Firebase não configurado. Adicione a variável FIREBASE_SERVICE_ACCOUNT no Render (Opção 1) ou crie o ficheiro firebase-credentials.json (Opção 2)."
+      });
+    }
+    // Test write/read ping
+    const pingRef = db.collection("_healthcheck").doc("ping");
+    await pingRef.set({ timestamp: new Date().toISOString(), status: "active" });
+    const doc = await pingRef.get();
+    res.json({
+      connected: true,
+      projectId: "study-35616",
+      message: "Ligação ao Firestore estabelecida com sucesso!",
+      data: doc.data()
+    });
+  } catch (error: any) {
+    console.error("Erro no healthcheck do Firestore:", error);
+    res.status(500).json({
+      connected: false,
+      error: error.message || "Erro de ligação ao Firestore."
+    });
   }
 });
 

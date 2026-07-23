@@ -7,12 +7,14 @@ import { Explorer } from './components/Explorer';
 import { ReaderArea } from './components/ReaderArea';
 import { StatusBar } from './components/StatusBar';
 import { QuickFindModal } from './components/QuickFindModal';
+import { StudyStatsModal } from './components/StudyStatsModal';
 
 export default function App() {
   const [activeModuleId, setActiveModuleId] = useState<ModuleId>('constituição');
   const [activeArticleId, setActiveArticleId] = useState<string | null>(null);
   const [explorerOpen, setExplorerOpen] = useState(true);
   const [quickFindOpen, setQuickFindOpen] = useState(false);
+  const [statsModalOpen, setStatsModalOpen] = useState(false);
 
   const {
     progress,
@@ -125,6 +127,7 @@ export default function App() {
           onToggleTheme={handleToggleTheme}
           explorerOpen={explorerOpen}
           onToggleExplorer={() => setExplorerOpen(!explorerOpen)}
+          onOpenStatsModal={() => setStatsModalOpen(true)}
         />
 
         {/* 2. EXPLORADOR (Chapters & Outline Tree) */}
@@ -182,6 +185,7 @@ export default function App() {
         totalArticles={allArticles.length}
         theme={progress.theme}
         onOpenQuickFind={() => setQuickFindOpen(true)}
+        onOpenStatsModal={() => setStatsModalOpen(true)}
       />
 
       {/* 5. QUICK-FIND MODAL (Ctrl+K) */}
@@ -191,6 +195,15 @@ export default function App() {
         onSelectResult={handleSelectQuickFindResult}
         studiedArticleIds={progress.studiedArticleIds}
         theme={progress.theme}
+      />
+
+      {/* 6. PAINEL DE ESTATÍSTICAS DE ESTUDO */}
+      <StudyStatsModal
+        isOpen={statsModalOpen}
+        onClose={() => setStatsModalOpen(false)}
+        progress={progress}
+        theme={progress.theme}
+        onSelectModule={(mId) => setActiveModuleId(mId as ModuleId)}
       />
     </div>
   );

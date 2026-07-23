@@ -11,6 +11,7 @@ interface StatusBarProps {
   totalArticles: number;
   theme: 'light' | 'dark' | 'sepia';
   onOpenQuickFind?: () => void;
+  onOpenStatsModal?: () => void;
 }
 
 export const StatusBar: React.FC<StatusBarProps> = ({
@@ -21,7 +22,8 @@ export const StatusBar: React.FC<StatusBarProps> = ({
   studiedCount,
   totalArticles,
   theme,
-  onOpenQuickFind
+  onOpenQuickFind,
+  onOpenStatsModal
 }) => {
   const [timelineOpen, setTimelineOpen] = useState(false);
 
@@ -299,8 +301,13 @@ export const StatusBar: React.FC<StatusBarProps> = ({
       </div>
 
       {/* 4. Progresso Geral do Módulo */}
-      <div className="hidden lg:flex items-center gap-2">
-        <BarChart2 className="w-3.5 h-3.5 opacity-70" />
+      <button
+        id="btn-statusbar-stats"
+        onClick={onOpenStatsModal}
+        className="hidden lg:flex items-center gap-2 hover:bg-neutral-200/50 dark:hover:bg-neutral-800 px-2 py-0.5 rounded transition-all cursor-pointer text-left"
+        title="Abrir Painel de Estatísticas de Estudo"
+      >
+        <BarChart2 className="w-3.5 h-3.5 text-amber-500" />
         <span>
           Módulo: {studiedCount}/{totalArticles} ({progressPercent}%)
         </span>
@@ -310,7 +317,7 @@ export const StatusBar: React.FC<StatusBarProps> = ({
             style={{ width: `${progressPercent}%` }}
           />
         </div>
-      </div>
+      </button>
 
       {/* 5. Modo Offline */}
       <div className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-semibold">

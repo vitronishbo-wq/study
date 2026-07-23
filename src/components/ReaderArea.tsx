@@ -4,6 +4,9 @@ import { SummaryView } from './SummaryView';
 import { FlashcardView } from './FlashcardView';
 import { QuestionPractice } from './QuestionPractice';
 import { ArticleAiQuiz } from './ArticleAiQuiz';
+import { AudioPlayer } from './AudioPlayer';
+import { DpaModal } from './DpaModal';
+import { DPAReferencePanel } from './DPAReferencePanel';
 import {
   CheckCircle2,
   Bookmark,
@@ -22,7 +25,13 @@ import {
   Check,
   Trash2,
   Sparkles,
-  Bot
+  Bot,
+  Volume2,
+  VolumeX,
+  Play,
+  Pause,
+  Square,
+  MapPin
 } from 'lucide-react';
 
 interface ReaderAreaProps {
@@ -74,11 +83,142 @@ export const ReaderArea: React.FC<ReaderAreaProps> = ({
   const [showInlineQuestionAnswer, setShowInlineQuestionAnswer] = useState(false);
   const [notesOpen, setNotesOpen] = useState(false);
   const [noteText, setNoteText] = useState(articleNote);
+  const [isDpaModalOpen, setIsDpaModalOpen] = useState(false);
 
   // Sync internal note text when article changes or external prop changes
   useEffect(() => {
     setNoteText(articleNote);
   }, [article.id, articleNote]);
+
+  // Text-to-Speech (TTS) State
+  const [ttsSupported, setTtsSupported] = useState<boolean>(true);
+  const [isTtsPlaying, setIsTtsPlaying] = useState<boolean>(false);
+  const [isTtsPaused, setIsTtsPaused] = useState<boolean>(false);
+  const [ttsRate, setTtsRate] = useState<number>(1.0);
+  const [ttsVoices, setTtsVoices] = useState<SpeechSynthesisVoice[]>([]);
+  const [selectedVoiceIndex, setSelectedVoiceIndex] = useState<number>(0);
+
+  // Initialize SpeechSynthesis and Voice options
+  useEffect(() => {
+    if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
+      setTtsSupported(false);
+      return;
+    }
+
+    const loadVoices = () => {
+      const availableVoices = window.speechSynthesis.getVoices();
+      setTtsVoices(availableVoices);
+      // Try finding a Portuguese voice (pt-PT or pt-BR)
+      const ptIndex = availableVoices.findIndex(v => v.lang.toLowerCase().startsWith('pt'));
+      if (ptIndex !== -1) {
+        setSelectedVoiceIndex(ptIndex);
+      }
+    };
+
+    loadVoices();
+    if (window.speechSynthesis.onvoiceschanged !== undefined) {
+      window.speechSynthesis.onvoiceschanged = loadVoices;
+    }
+  }, []);
+
+  // Cancel speech synthesis whenever current article changes
+  useEffect(() => {
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      setIsTtsPlaying(false);
+      setIsTtsPaused(false);
+    }
+  }, [article.id]);
+
+  // Clean up on component unmount
+  useEffect(() => {
+    return () => {
+      if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
+    };
+  }, []);
+
+  // Build full readable string for current article
+  const buildSpeechText = (): string => {
+    const parts: string[] = [];
+    parts.push(`${article.code}: ${article.title}.`);
+    if (article.legalText) {
+      parts.push(`Texto legal: ${article.legalText}`);
+    } else if (article.definition) {
+      parts.push(`Definição: ${article.definition}`);
+    }
+    if (article.simpleExplanation) {
+      parts.push(`Explicação simples: ${article.simpleExplanation}`);
+    }
+    if (article.importantPoints && article.importantPoints.length > 0) {
+      parts.push(`Pontos importantes: ${article.importantPoints.join('. ')}`);
+    }
+    return parts.join(' ');
+  };
+
+  const handlePlayTts = () => {
+    if (!ttsSupported || typeof window === 'undefined') return;
+
+    if (isTtsPaused) {
+      window.speechSynthesis.resume();
+      setIsTtsPlaying(true);
+      setIsTtsPaused(false);
+      return;
+    }
+
+    window.speechSynthesis.cancel();
+
+    const textToRead = buildSpeechText();
+    const utterance = new SpeechSynthesisUtterance(textToRead);
+    utterance.rate = ttsRate;
+
+    if (ttsVoices.length > 0 && ttsVoices[selectedVoiceIndex]) {
+      utterance.voice = ttsVoices[selectedVoiceIndex];
+    } else {
+      utterance.lang = 'pt-PT';
+    }
+
+    utterance.onend = () => {
+      setIsTtsPlaying(false);
+      setIsTtsPaused(false);
+    };
+
+    utterance.onerror = () => {
+      setIsTtsPlaying(false);
+      setIsTtsPaused(false);
+    };
+
+    window.speechSynthesis.speak(utterance);
+    setIsTtsPlaying(true);
+    setIsTtsPaused(false);
+  };
+
+  const handlePauseTts = () => {
+    if (!ttsSupported || typeof window === 'undefined') return;
+    if (isTtsPlaying) {
+      window.speechSynthesis.pause();
+      setIsTtsPlaying(false);
+      setIsTtsPaused(true);
+    }
+  };
+
+  const handleStopTts = () => {
+    if (!ttsSupported || typeof window === 'undefined') return;
+    window.speechSynthesis.cancel();
+    setIsTtsPlaying(false);
+    setIsTtsPaused(false);
+  };
+
+  const handleRateChange = (newRate: number) => {
+    setTtsRate(newRate);
+    if (isTtsPlaying) {
+      window.speechSynthesis.cancel();
+      setTimeout(() => {
+        handlePlayTts();
+      }, 50);
+    }
+  };
 
   const isDark = theme === 'dark';
   const isSepia = theme === 'sepia';
@@ -298,7 +438,16 @@ export const ReaderArea: React.FC<ReaderAreaProps> = ({
 
         {/* STRICT LEITURA MODE (Adhering to Master Directive Order) */}
         {activeMode === 'reading' && (
-          <article className={`max-w-3xl mx-auto space-y-8 ${fontFamilyClass}`}>
+          <article className={`max-w-3xl mx-auto space-y-6 ${fontFamilyClass}`}>
+            {/* AudioPlayer Component at the Top */}
+            <AudioPlayer article={article} theme={theme} />
+
+            {/* DPA Quick Reference Panel (Lei n.º 14/24 - 21 Províncias) */}
+            <DPAReferencePanel
+              theme={theme}
+              onOpenFullModal={() => setIsDpaModalOpen(true)}
+            />
+
             {/* 1. TÍTULO */}
             <header className="border-b pb-4 border-neutral-200/80 dark:border-neutral-800 flex items-start justify-between gap-4">
               <div>
@@ -402,6 +551,37 @@ export const ReaderArea: React.FC<ReaderAreaProps> = ({
                   )}
                 </div>
 
+                {/* DPA Quick Reference Button (Lei n.º 14/24) */}
+                <button
+                  onClick={() => setIsDpaModalOpen(true)}
+                  id="btn-dpa-reference"
+                  title="Consultar Nova Divisão Político-Administrativa (21 Províncias - Lei n.º 14/24)"
+                  className="px-2.5 py-1.5 rounded-lg border border-amber-500/40 bg-amber-500/10 text-amber-800 dark:text-amber-300 hover:bg-amber-500/20 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs"
+                >
+                  <MapPin className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+                  <span className="hidden sm:inline">DPA (21 Províncias)</span>
+                </button>
+
+                {/* Audio Reader TTS Quick Button */}
+                {ttsSupported && (
+                  <button
+                    onClick={isTtsPlaying ? handlePauseTts : handlePlayTts}
+                    title={isTtsPlaying ? 'Pausar Áudio-Leitura' : 'Ouvir Artigo em Voz Alta (TTS)'}
+                    className={`p-2 rounded-lg border transition-all flex items-center gap-1.5 text-xs font-medium cursor-pointer ${
+                      isTtsPlaying
+                        ? 'bg-amber-500 text-white border-amber-600 shadow-xs animate-pulse font-bold'
+                        : isTtsPaused
+                        ? 'bg-amber-100 text-amber-900 border-amber-300 dark:bg-amber-950 dark:text-amber-200'
+                        : 'border-neutral-300 dark:border-neutral-800 text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-200'
+                    }`}
+                  >
+                    <Volume2 className="w-4 h-4" />
+                    <span className="hidden md:inline">
+                      {isTtsPlaying ? 'Pausar' : isTtsPaused ? 'Continuar' : 'Ouvir'}
+                    </span>
+                  </button>
+                )}
+
                 <button
                   onClick={onToggleBookmark}
                   title={isBookmarked ? 'Remover dos Favoritos' : 'Guardar nos Favoritos'}
@@ -426,6 +606,110 @@ export const ReaderArea: React.FC<ReaderAreaProps> = ({
                 </button>
               </div>
             </header>
+
+            {/* Text-To-Speech (TTS) Control Bar */}
+            {ttsSupported && (
+              <div
+                id="tts-player-bar"
+                className={`p-3.5 rounded-2xl border flex flex-wrap items-center justify-between gap-3 transition-all ${
+                  isTtsPlaying
+                    ? 'bg-amber-500/10 border-amber-500/40 text-amber-900 dark:text-amber-200'
+                    : isDark
+                    ? 'bg-neutral-900/60 border-neutral-800'
+                    : isSepia
+                    ? 'bg-[#f4ead5] border-[#ded0b1]'
+                    : 'bg-neutral-50 border-neutral-200'
+                }`}
+              >
+                <div className="flex items-center gap-2.5">
+                  <div className={`p-2 rounded-xl ${isTtsPlaying ? 'bg-amber-500 text-white animate-pulse' : 'bg-neutral-200/80 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300'}`}>
+                    <Volume2 className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <span className="text-xs font-bold block">
+                      {isTtsPlaying
+                        ? 'A ler artigo em voz alta...'
+                        : isTtsPaused
+                        ? 'Áudio pausado'
+                        : 'Áudio-Leitura em Voz Alta (TTS)'}
+                    </span>
+                    <span className="text-[11px] opacity-70 block">
+                      {isTtsPlaying
+                        ? 'Clique em pausar ou parar para interromper a leitura'
+                        : 'Ouve a leitura automática do texto legal e definições'}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 flex-wrap">
+                  {/* Play / Pause Button */}
+                  {!isTtsPlaying ? (
+                    <button
+                      onClick={handlePlayTts}
+                      id="btn-tts-play"
+                      className="px-3.5 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-xs transition-all cursor-pointer"
+                    >
+                      <Play className="w-3.5 h-3.5 fill-current" />
+                      <span>{isTtsPaused ? 'Continuar' : 'Ouvir'}</span>
+                    </button>
+                  ) : (
+                    <button
+                      onClick={handlePauseTts}
+                      id="btn-tts-pause"
+                      className="px-3.5 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-xs transition-all cursor-pointer"
+                    >
+                      <Pause className="w-3.5 h-3.5 fill-current" />
+                      <span>Pausar</span>
+                    </button>
+                  )}
+
+                  {/* Stop Button */}
+                  {(isTtsPlaying || isTtsPaused) && (
+                    <button
+                      onClick={handleStopTts}
+                      id="btn-tts-stop"
+                      className="px-3.5 py-1.5 rounded-xl bg-neutral-200 hover:bg-neutral-300 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-200 font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer"
+                    >
+                      <Square className="w-3.5 h-3.5 fill-current" />
+                      <span>Parar</span>
+                    </button>
+                  )}
+
+                  {/* Speed Rate selector */}
+                  <div className="flex items-center gap-1 bg-neutral-200/60 dark:bg-neutral-800/80 p-1 rounded-xl text-[11px]">
+                    {[0.8, 1.0, 1.25, 1.5].map((rate) => (
+                      <button
+                        key={rate}
+                        onClick={() => handleRateChange(rate)}
+                        className={`px-2 py-0.5 rounded-lg font-bold transition-all cursor-pointer ${
+                          ttsRate === rate
+                            ? 'bg-amber-500 text-white shadow-xs'
+                            : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900'
+                        }`}
+                      >
+                        {rate}x
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Voice selector */}
+                  {ttsVoices.length > 1 && (
+                    <select
+                      value={selectedVoiceIndex}
+                      onChange={(e) => setSelectedVoiceIndex(Number(e.target.value))}
+                      className="text-xs p-1 rounded-xl border bg-white dark:bg-neutral-900 border-neutral-300 dark:border-neutral-700 text-neutral-800 dark:text-neutral-200 focus:outline-none max-w-[140px] truncate"
+                      title="Escolher Voz do Sistema"
+                    >
+                      {ttsVoices.map((voice, idx) => (
+                        <option key={idx} value={idx}>
+                          {voice.name} ({voice.lang})
+                        </option>
+                      ))}
+                    </select>
+                  )}
+                </div>
+              </div>
+            )}
 
             {/* 2. DEFINIÇÃO / TEXTO LEGAL COMPLETO */}
             <section className="space-y-2">
@@ -602,6 +886,13 @@ export const ReaderArea: React.FC<ReaderAreaProps> = ({
           </article>
         )}
       </div>
+
+      {/* DPA Legal Reference Modal (Lei n.º 14/24) */}
+      <DpaModal
+        isOpen={isDpaModalOpen}
+        onClose={() => setIsDpaModalOpen(false)}
+        theme={theme}
+      />
     </main>
   );
 };
