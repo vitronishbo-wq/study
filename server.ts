@@ -255,9 +255,45 @@ async function setupServer() {
     app.use(vite.middlewares);
   } else {
     const distPath = path.join(process.cwd(), 'dist');
+    const indexPath = path.join(distPath, 'index.html');
+
+    if (!fs.existsSync(indexPath)) {
+      console.warn("⚠️ AVISO DE BUILD: A pasta 'dist' ou o ficheiro 'index.html' não foi encontrado.");
+      console.warn("Certifique-se de que configurou o 'Build Command' no Render como: bun install && bun run build (ou npm install && npm run build).");
+    }
+
     app.use(express.static(distPath));
     app.get('*', (req: express.Request, res: express.Response) => {
-      res.sendFile(path.join(distPath, 'index.html'));
+      if (!fs.existsSync(indexPath)) {
+        return res.status(503).send(`
+          <!DOCTYPE html>
+          <html lang="pt">
+          <head>
+            <meta charset="UTF-8">
+            <title>Erro de Build - Render</title>
+            <style>
+              body { font-family: system-ui, sans-serif; padding: 2rem; max-width: 600px; margin: 0 auto; background: #0f172a; color: #f8fafc; line-height: 1.6; }
+              .card { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 1.5rem; }
+              code { background: #0284c7; color: #fff; padding: 0.2rem 0.5rem; border-radius: 4px; font-weight: bold; }
+            </style>
+          </head>
+          <body>
+            <div class="card">
+              <h2>⚠️ Ficheiro dist/index.html não encontrado</h2>
+              <p>O servidor backend está a funcionar, mas a aplicação frontend ainda não foi compilada no Render.</p>
+              <h3>🛠️ Como Resolver no Render:</h3>
+              <ol>
+                <li>Vá a <strong>Dashboard -> Seu Serviço -> Settings</strong></li>
+                <li>Altere o <strong>Build Command</strong> para: <code>npm install && npm run build</code> ou <code>bun install && bun run build</code></li>
+                <li>Altere o <strong>Start Command</strong> para: <code>npm run start</code> ou <code>node dist/server.cjs</code> (ou <code>bun server.ts</code>)</li>
+                <li>Execute um novo <strong>Manual Deploy</strong>.</li>
+              </ol>
+            </div>
+          </body>
+          </html>
+        `);
+      }
+      res.sendFile(indexPath);
     });
   }
 
