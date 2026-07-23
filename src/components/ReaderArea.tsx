@@ -31,7 +31,8 @@ import {
   Play,
   Pause,
   Square,
-  MapPin
+  MapPin,
+  Menu
 } from 'lucide-react';
 
 interface ReaderAreaProps {
@@ -55,6 +56,8 @@ interface ReaderAreaProps {
   hasNext: boolean;
   hasPrev: boolean;
   onSaveQuizScore?: (correct: number, total: number) => void;
+  explorerOpen?: boolean;
+  onToggleExplorer?: () => void;
 }
 
 export const ReaderArea: React.FC<ReaderAreaProps> = ({
@@ -77,7 +80,9 @@ export const ReaderArea: React.FC<ReaderAreaProps> = ({
   onPrevArticle,
   hasNext,
   hasPrev,
-  onSaveQuizScore
+  onSaveQuizScore,
+  explorerOpen,
+  onToggleExplorer
 }) => {
   const [activeMode, setActiveMode] = useState<StudyMode>('reading');
   const [showInlineQuestionAnswer, setShowInlineQuestionAnswer] = useState(false);
@@ -254,7 +259,7 @@ export const ReaderArea: React.FC<ReaderAreaProps> = ({
     >
       {/* Discreet Reader Bar Options */}
       <div
-        className={`px-6 py-3 border-b flex items-center justify-between gap-4 select-none ${
+        className={`px-3 md:px-6 py-2.5 md:py-3 border-b flex items-center justify-between gap-2.5 md:gap-4 select-none ${
           isDark
             ? 'bg-neutral-900/80 border-neutral-800'
             : isSepia
@@ -262,15 +267,27 @@ export const ReaderArea: React.FC<ReaderAreaProps> = ({
             : 'bg-neutral-50 border-neutral-200'
         }`}
       >
-        {/* Module & Breadcrumb Info */}
-        <div className="flex items-center gap-2 truncate text-xs text-neutral-500 dark:text-neutral-400">
-          <span className="font-semibold text-neutral-800 dark:text-neutral-200">{moduleData.shortTitle}</span>
+        {/* Mobile Navigation Toggle Button & Breadcrumb Info */}
+        <div className="flex items-center gap-2 truncate text-xs text-neutral-500 dark:text-neutral-400 min-w-0">
+          {onToggleExplorer && (
+            <button
+              id="btn-mobile-toggle-explorer"
+              onClick={onToggleExplorer}
+              className="md:hidden flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-amber-500/30 bg-amber-500/10 text-amber-800 dark:text-amber-300 font-bold text-xs hover:bg-amber-500/20 transition-all flex-shrink-0 cursor-pointer shadow-2xs"
+              title={explorerOpen ? 'Recolher Menu' : 'Abrir Módulos e Conteúdos'}
+            >
+              <Menu className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+              <span>Módulos</span>
+            </button>
+          )}
+
+          <span className="font-semibold text-neutral-800 dark:text-neutral-200 truncate">{moduleData.shortTitle}</span>
           <span>›</span>
-          <span className="truncate">{chapterTitle}</span>
+          <span className="truncate hidden sm:inline">{chapterTitle}</span>
           {sectionTitle && (
             <>
-              <span>›</span>
-              <span className="truncate">{sectionTitle}</span>
+              <span className="hidden sm:inline">›</span>
+              <span className="truncate hidden md:inline">{sectionTitle}</span>
             </>
           )}
         </div>

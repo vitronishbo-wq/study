@@ -10,6 +10,7 @@ interface ExplorerProps {
   onSelectModule?: (moduleId: ModuleId) => void;
   studiedArticleIds: string[];
   theme: 'light' | 'dark' | 'sepia';
+  onCloseExplorer?: () => void;
 }
 
 export const Explorer: React.FC<ExplorerProps> = ({
@@ -18,7 +19,8 @@ export const Explorer: React.FC<ExplorerProps> = ({
   onSelectArticle,
   onSelectModule,
   studiedArticleIds,
-  theme
+  theme,
+  onCloseExplorer
 }) => {
   // "Tudo nasce fechado. O utilizador decide o que abrir."
   const [openChapterIds, setOpenChapterIds] = useState<Set<string>>(new Set());
@@ -129,6 +131,9 @@ export const Explorer: React.FC<ExplorerProps> = ({
       onSelectModule(targetModuleId);
     }
     onSelectArticle(articleId);
+    if (onCloseExplorer) {
+      onCloseExplorer();
+    }
   };
 
   return (
@@ -145,12 +150,24 @@ export const Explorer: React.FC<ExplorerProps> = ({
       {/* Explorer Header & Global Search Field */}
       <div className="p-3.5 border-b border-neutral-200 dark:border-neutral-800/80 flex flex-col gap-2.5">
         <div className="flex items-center justify-between">
-          <span className="text-xs font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400 flex items-center gap-1.5">
-            Explorador de Conteúdo
+          <span className="text-xs font-bold uppercase tracking-wider text-neutral-500 dark:text-neutral-400 flex items-center gap-1.5">
+            Explorador
           </span>
-          <span className="text-[10px] px-2 py-0.5 rounded bg-neutral-200 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 font-mono">
-            {cleanQuery ? `${totalMatchesCount} resultados` : `${moduleData.chapters.length} Capítulos`}
-          </span>
+          <div className="flex items-center gap-1.5">
+            <span className="text-[10px] px-2 py-0.5 rounded bg-neutral-200 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 font-mono">
+              {cleanQuery ? `${totalMatchesCount} res.` : `${moduleData.chapters.length} Cap.`}
+            </span>
+            {onCloseExplorer && (
+              <button
+                id="btn-close-explorer"
+                onClick={onCloseExplorer}
+                title="Recolher Explorador (Fechar)"
+                className="p-1.5 rounded-md hover:bg-neutral-200 dark:hover:bg-neutral-800 text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Search input field */}

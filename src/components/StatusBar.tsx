@@ -12,6 +12,7 @@ interface StatusBarProps {
   theme: 'light' | 'dark' | 'sepia';
   onOpenQuickFind?: () => void;
   onOpenStatsModal?: () => void;
+  onToggleExplorer?: () => void;
 }
 
 export const StatusBar: React.FC<StatusBarProps> = ({
@@ -23,7 +24,8 @@ export const StatusBar: React.FC<StatusBarProps> = ({
   totalArticles,
   theme,
   onOpenQuickFind,
-  onOpenStatsModal
+  onOpenStatsModal,
+  onToggleExplorer
 }) => {
   const [timelineOpen, setTimelineOpen] = useState(false);
 

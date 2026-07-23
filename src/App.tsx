@@ -117,30 +117,76 @@ export default function App() {
       }`}
     >
       {/* Top Main Layout: Sidebar + Explorer + Reader Area */}
-      <div className="flex-1 flex overflow-hidden">
-        {/* 1. BARRA LATERAL (Narrow 5-module switcher) */}
-        <Sidebar
-          activeModuleId={activeModuleId}
-          onSelectModule={setActiveModuleId}
-          studiedArticleIds={progress.studiedArticleIds}
-          theme={progress.theme}
-          onToggleTheme={handleToggleTheme}
-          explorerOpen={explorerOpen}
-          onToggleExplorer={() => setExplorerOpen(!explorerOpen)}
-          onOpenStatsModal={() => setStatsModalOpen(true)}
-        />
-
-        {/* 2. EXPLORADOR (Chapters & Outline Tree) */}
+      <div className="flex-1 flex overflow-hidden relative">
+        {/* MOBILE BACKDROP OVERLAY FOR SMARTPHONE DRAWER */}
         {explorerOpen && (
-          <Explorer
-            moduleData={currentModule}
-            activeArticleId={activeArticle?.id || null}
-            onSelectArticle={setActiveArticleId}
+          <div
+            id="mobile-explorer-backdrop"
+            className="fixed inset-0 bg-neutral-950/70 backdrop-blur-xs z-40 md:hidden animate-in fade-in duration-200"
+            onClick={() => setExplorerOpen(false)}
+          />
+        )}
+
+        {/* DESKTOP SIDEBAR (Visible on md+ screens) */}
+        <div className="hidden md:flex flex-shrink-0 h-full">
+          <Sidebar
+            activeModuleId={activeModuleId}
             onSelectModule={setActiveModuleId}
             studiedArticleIds={progress.studiedArticleIds}
             theme={progress.theme}
+            onToggleTheme={handleToggleTheme}
+            explorerOpen={explorerOpen}
+            onToggleExplorer={() => setExplorerOpen(!explorerOpen)}
+            onOpenStatsModal={() => setStatsModalOpen(true)}
           />
+        </div>
+
+        {/* DESKTOP EXPLORER (Collapsible panel on md+ screens) */}
+        {explorerOpen && (
+          <div className="hidden md:flex flex-shrink-0 h-full">
+            <Explorer
+              moduleData={currentModule}
+              activeArticleId={activeArticle?.id || null}
+              onSelectArticle={setActiveArticleId}
+              onSelectModule={setActiveModuleId}
+              studiedArticleIds={progress.studiedArticleIds}
+              theme={progress.theme}
+              onCloseExplorer={() => setExplorerOpen(false)}
+            />
+          </div>
         )}
+
+        {/* MOBILE COMBINED SLIDE-OVER DRAWER (Smartphone Sidebar + Explorer overlay) */}
+        <div
+          id="mobile-drawer-container"
+          className={`fixed inset-y-0 left-0 z-50 flex h-full max-w-[90vw] sm:max-w-md shadow-2xl transition-transform duration-200 ease-in-out md:hidden ${
+            explorerOpen ? 'translate-x-0' : '-translate-x-full'
+          }`}
+        >
+          <Sidebar
+            activeModuleId={activeModuleId}
+            onSelectModule={setActiveModuleId}
+            studiedArticleIds={progress.studiedArticleIds}
+            theme={progress.theme}
+            onToggleTheme={handleToggleTheme}
+            explorerOpen={explorerOpen}
+            onToggleExplorer={() => setExplorerOpen(!explorerOpen)}
+            onOpenStatsModal={() => setStatsModalOpen(true)}
+          />
+
+          <Explorer
+            moduleData={currentModule}
+            activeArticleId={activeArticle?.id || null}
+            onSelectArticle={(artId) => {
+              setActiveArticleId(artId);
+              setExplorerOpen(false); // Auto-close drawer on smartphone selection
+            }}
+            onSelectModule={setActiveModuleId}
+            studiedArticleIds={progress.studiedArticleIds}
+            theme={progress.theme}
+            onCloseExplorer={() => setExplorerOpen(false)}
+          />
+        </div>
 
         {/* 3. ÁREA PRINCIPAL (>85% Screen Digital Book) */}
         {activeArticle ? (
@@ -165,6 +211,8 @@ export default function App() {
             hasNext={hasNext}
             hasPrev={hasPrev}
             onSaveQuizScore={(corr, tot) => saveQuizScore(activeArticle.id, corr, tot)}
+            explorerOpen={explorerOpen}
+            onToggleExplorer={() => setExplorerOpen(!explorerOpen)}
           />
         ) : (
           <div className="flex-1 flex items-center justify-center p-8 text-neutral-400">
@@ -186,6 +234,7 @@ export default function App() {
         theme={progress.theme}
         onOpenQuickFind={() => setQuickFindOpen(true)}
         onOpenStatsModal={() => setStatsModalOpen(true)}
+        onToggleExplorer={() => setExplorerOpen(!explorerOpen)}
       />
 
       {/* 5. QUICK-FIND MODAL (Ctrl+K) */}
