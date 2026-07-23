@@ -1,0 +1,6 @@
+{
+  "name": "Plataforma de Estudo MININT",
+  "description": "Plataforma oficial de preparação para concursos públicos do Ministério do Interior de Angola (MININT). Livro digital inteligente e offline.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
