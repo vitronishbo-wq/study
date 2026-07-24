@@ -47,7 +47,10 @@ function getFirestoreDb() {
     }
 
     if (credential) {
-      initializeApp({ credential });
+      initializeApp({
+        credential,
+        storageBucket: process.env.FIREBASE_STORAGE_BUCKET || 'study-35616.appspot.com'
+      });
       dbInstance = getFirestore();
       console.log("🔥 Firebase Admin inicializado com sucesso!");
       return dbInstance;
@@ -245,8 +248,24 @@ Instruções:
   }
 });
 
+// Serve Service Worker with no-cache headers to ensure immediate PWA update detection
+app.get('/sw.js', (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+  res.setHeader('Content-Type', 'application/javascript');
+  const swPathInDist = path.join(process.cwd(), 'dist', 'sw.js');
+  const swPathInPublic = path.join(process.cwd(), 'public', 'sw.js');
+  
+  if (fs.existsSync(swPathInDist)) {
+    return res.sendFile(swPathInDist);
+  } else if (fs.existsSync(swPathInPublic)) {
+    return res.sendFile(swPathInPublic);
+  }
+  next();
+});
+
 // Vite middleware setup
 async function setupServer() {
+
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({
       server: { middlewareMode: true },

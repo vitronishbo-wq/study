@@ -1,13 +1,27 @@
 <!doctype html>
-<html lang="en">
+<html lang="pt-AO">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>My Google AI Studio App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Preparatório Oficial MININT - Plataforma de Estudo</title>
+    <meta name="description" content="Plataforma oficial de preparação e simulados para os exames e concursos do Ministério do Interior (MININT - Angola)." />
+    
+    <!-- PWA Manifest & Icons -->
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+    <link rel="apple-touch-icon" href="/icon.svg" />
+    
+    <!-- PWA Mobile & Theme Color Settings -->
+    <meta name="theme-color" content="#0f172a" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="MININT Prep" />
+    <meta name="mobile-web-app-capable" content="yes" />
   </head>
-  <body>
+  <body class="bg-neutral-950 text-neutral-100 antialiased selection:bg-amber-500 selection:text-neutral-950">
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
+
 

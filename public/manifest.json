@@ -1,0 +1,37 @@
+{
+  "id": "preparatorio-oficial-minint",
+  "name": "Preparatório Oficial MININT",
+  "short_name": "MININT Prep",
+  "description": "Plataforma oficial de preparação e simulados para os exames e concursos do Ministério do Interior (MININT - Angola).",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
+  "lang": "pt-AO",
+  "categories": ["education", "books", "productivity"],
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Ver Matérias",
+      "short_name": "Matérias",
+      "description": "Explorar o programa oficial de estudo",
+      "url": "/?view=explorer",
+      "icons": [{ "src": "/icon.svg", "sizes": "192x192" }]
+    }
+  ]
+}

@@ -2,11 +2,47 @@ services:
   - type: web
     name: preparacao-oficial-minint
     env: node
-    buildCommand: npm install && npm run build
-    startCommand: npm run start
+    buildCommand: bun install && bun run build
+    startCommand: bun server.ts
     envVars:
       - key: NODE_ENV
         value: production
+      - key: APP_NAME
+        value: Preparatório Oficial MININT
+      - key: APP_ENV
+        value: production
+      - key: DEFAULT_LANGUAGE
+        value: pt-AO
+      - key: COUNTRY
+        value: AO
+      - key: TIMEZONE
+        value: Africa/Luanda
+      - key: VITRONIS_PLATFORM
+        value: vitronis
+      - key: VITRONIS_ENV
+        value: production
+      - key: VITRONIS_WEB
+        value: https://www.vitronis.co.ao
+      - key: VITRONIS_API
+        value: https://api.vitronis.co.ao
+      - key: VITRONIS_CONSOLE
+        value: https://console.vitronis.co.ao
+      - key: VITRONIS_STATUS
+        value: https://status.vitronis.co.ao
+      - key: VITRONIS_DOMAIN
+        value: vitronis.co.ao
+      - key: VITRONIS_DEFAULT_LANGUAGE
+        value: pt-AO
+      - key: VITRONIS_SSO_DOMAIN
+        value: https://accounts.vitronis.co.ao
+      - key: VITRONIS_JWT_ISSUER
+        value: accounts.vitronis.co.ao
+      - key: VITRONIS_JWT_AUDIENCE
+        value: vitronis-platform
+      - key: JOBEXPRESS_URL
+        value: https://jobexpress.vitronis.co.ao
+      - key: RETURN_AFTER_LOGIN
+        value: https://preparacao-oficial-minint-ckkm.onrender.com
       - key: GEMINI_API_KEY
         sync: false
       - key: FIREBASE_PROJECT_ID
@@ -15,3 +51,6 @@ services:
         sync: false
       - key: FIREBASE_PRIVATE_KEY
         sync: false
+      - key: FIREBASE_STORAGE_BUCKET
+        sync: false
+
