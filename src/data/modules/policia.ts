@@ -12,9 +12,13 @@ export const policiaModule: DiplomaModule = {
     {
       id: 'pna-cap-1',
       title: 'Capítulo I - Disposições Gerais (Natureza, Missão e Atribuições)',
-      articles: [
+      sections: [
         {
-          id: 'pna-dp-152-19',
+          id: 'pna-sec-1-1',
+          title: 'Secção I - Aprovação, Âmbito, Natureza e Atribuições da PNA',
+          articles: [
+            {
+              id: 'pna-dp-152-19',
           code: 'Decreto Presidencial n.º 152/19',
           title: 'Aprovação e Âmbito de Aplicação do Estatuto Orgânico da PNA',
           legalText: 'Artigo 1.º (Aprovação): É aprovado o Estatuto Orgânico da Polícia Nacional de Angola, anexo ao presente Decreto Presidencial.\nArtigo 2.º (Revogação): É revogada toda a legislação que contrarie o disposto no presente Decreto Presidencial, nomeadamente o Decreto n.º 10/95, de 28 de Abril, e o Decreto n.º 20/93, de 11 de Junho.\nArtigo 4.º (Entrada em Vigor): O presente Decreto Presidencial entra em vigor na data da sua publicação (15 de Maio de 2019).',
@@ -182,13 +186,19 @@ export const policiaModule: DiplomaModule = {
           ]
         }
       ]
-    },
+    }
+  ]
+},
     {
       id: 'pna-cap-2',
       title: 'Capítulo II & III - Estrutura Orgânica e Comando Geral',
-      articles: [
+      sections: [
         {
-          id: 'pna-art-5',
+          id: 'pna-sec-2-1',
+          title: 'Secção I - Estrutura Orgânica Geral, Comando Geral e Forma dos Actos',
+          articles: [
+            {
+              id: 'pna-art-5',
           code: 'Artigo 5.º',
           title: 'Estrutura Orgânica Geral da PNA',
           legalText: 'Artigo 5.º (Estrutura Orgânica): A estrutura orgânica da PNA compreende:\n1. Comando Geral da PNA (Comandante Geral e dois 2.os Comandantes Gerais).\n2. Órgãos de Apoio Consultivo (Conselho Superior de Polícia, Conselho Superior de Quadros, Conselho Superior de Justiça e Disciplina, Conselho de Comandantes).\n3. Serviços de Apoio Instrumental (Gabinete do Comandante Geral, Gabinetes dos 2.os Comandantes Gerais, Corpo de Conselheiros).\n4. Serviços de Apoio Técnico (Inspecção, Direcções Nacionais: Operações, Educação Patriótica, Comunicação, Trânsito, Informações, Pessoal, Finanças, Telecomunicações, Logística, Transportes, Infra-Estruturas, Saúde, Administração, Intercâmbio, Assessoria Jurídica, Estudos e Planeamento).\n5. Órgãos de Doutrina e Ensino Policial (Direcção de Doutrina, ISCPC, Academia de Polícia, Escola Prática de Polícia, Centro de Cavalaria e Cinotecnia, Colégio de Polícia).\n6. Unidades Centrais (PIR, PGF, Polícia Fiscal Aduaneira, PSP/Entidades Protocolares, Segurança de Objectivos Estratégicos, DIIP, Unidade de Aviação).\n7. Unidades Territoriais (Comandos Provinciais).',
@@ -276,13 +286,19 @@ export const policiaModule: DiplomaModule = {
           ]
         }
       ]
-    },
+    }
+  ]
+},
     {
       id: 'pna-cap-3',
       title: 'Capítulo III - Órgãos de Ensino Policial e Unidades Centrais',
-      articles: [
+      sections: [
         {
-          id: 'pna-art-36-41',
+          id: 'pna-sec-3-1',
+          title: 'Secção I - Ensino Policial, Unidades Centrais, Especialidades e Territorialidade',
+          articles: [
+            {
+              id: 'pna-art-36-41',
           code: 'Artigos 36.º a 41.º',
           title: 'Doutrina e Estabelecimentos de Ensino Policial (ISCPC, Academia e Escola Prática)',
           legalText: 'Artigo 37.º (ISCPC): O Instituto Superior de Ciências Policiais e Criminais é a instituição de ensino superior da PNA destinada a formar oficiais de polícia e ministrar cursos de acesso à subclasse de Oficiais Comissários, gozando de autonomia científica e pedagógica.\nArtigo 38.º (Academia de Polícia): Ministra cursos de acesso às subclasses de Oficiais Subalternos e Superiores.\nArtigo 39.º (Escola Prática de Polícia): Ministra a formação básica inicial de acesso à Classe de Agentes e curso de acesso à Classe de Subchefes.\nArtigo 40.º: Centro de Formação e Adestramento de Cavalaria e Cinotecnia.\nArtigo 41.º: Colégio de Polícia (Ensino secundário geral com doutrina castrense).',
@@ -408,13 +424,19 @@ export const policiaModule: DiplomaModule = {
           ]
         }
       ]
-    },
+    }
+  ]
+},
     {
       id: 'pna-cap-4-5',
       title: 'Capítulo IV & V - Regime Estatutário, Pessoal e Direitos',
-      articles: [
+      sections: [
         {
-          id: 'pna-art-51-55',
+          id: 'pna-sec-4-1',
+          title: 'Secção I - Deontologia, Prisão Própria, Patrocínio Judiciário e Identificação (NIP)',
+          articles: [
+            {
+              id: 'pna-art-51-55',
           code: 'Artigos 51.º a 55.º',
           title: 'Regime Deontológico, Prisional, Patrocínio Judiciário e Dispensa de Serviço',
           legalText: 'Artigo 51.º: O pessoal militarizado da PNA rege-se por um código deontológico próprio e regime disciplinar específico. O pessoal civil rege-se pelo regime da Função Pública.\nArtigo 52.º (Regime Penitenciário): A prisão preventiva e cumprimento de penas do pessoal militarizado em estabelecimentos prisionais comuns efectua-se em REGIME DE SEPARAÇÃO dos restantes detidos civis.\nArtigo 53.º (Patrocínio Judiciário): O pessoal da PNA tem direito a assistência e patrocínio judiciário pago pela PNA por actos praticados em serviço.\nArtigo 55.º: Dispensa de serviço a pedido do agente ou por iniciativa do Comandante Geral como medida disciplinar.',
@@ -533,4 +555,6 @@ export const policiaModule: DiplomaModule = {
       ]
     }
   ]
+}
+]
 };

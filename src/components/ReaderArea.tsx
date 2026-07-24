@@ -39,7 +39,8 @@ import {
   Compass,
   Eye,
   Target,
-  Focus
+  Focus,
+  Search
 } from 'lucide-react';
 
 interface ReaderAreaProps {
@@ -108,6 +109,62 @@ export const ReaderArea: React.FC<ReaderAreaProps> = ({
   // Modo Foco State (Reading mask blur & active paragraph highlight)
   const [isFocusMode, setIsFocusMode] = useState(false);
   const [focusedSectionId, setFocusedSectionId] = useState<string>('legalText');
+
+  // In-Article Text Search State
+  const [articleSearchQuery, setArticleSearchQuery] = useState('');
+  const [isArticleSearchOpen, setIsArticleSearchOpen] = useState(false);
+
+  // Helper to highlight search query matches in text
+  const highlightMatch = (text: string) => {
+    if (!articleSearchQuery || articleSearchQuery.trim().length < 2 || !text) {
+      return text;
+    }
+    const trimmed = articleSearchQuery.trim();
+    const escaped = trimmed.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const parts = text.split(new RegExp(`(${escaped})`, 'gi'));
+
+    return parts.map((part, i) =>
+      part.toLowerCase() === trimmed.toLowerCase() ? (
+        <mark
+          key={i}
+          className="bg-amber-300 dark:bg-amber-500/80 text-neutral-900 dark:text-neutral-100 font-bold px-0.5 rounded-xs shadow-2xs"
+        >
+          {part}
+        </mark>
+      ) : (
+        part
+      )
+    );
+  };
+
+  // Compute total occurrences of search query in current article
+  const getSearchMatchCount = () => {
+    if (!articleSearchQuery || articleSearchQuery.trim().length < 2) return 0;
+    const q = articleSearchQuery.trim().toLowerCase();
+    let count = 0;
+    const checkStr = (str?: string) => {
+      if (!str) return;
+      const matches = str.toLowerCase().split(q).length - 1;
+      count += Math.max(0, matches);
+    };
+
+    checkStr(article.code);
+    checkStr(article.title);
+    checkStr(article.legalText || article.definition);
+    checkStr(article.simpleExplanation);
+    article.importantPoints?.forEach(p => checkStr(p));
+    checkStr(article.examAlert);
+    return count;
+  };
+
+  // Auto-open simple explanation accordion if search matches
+  useEffect(() => {
+    if (articleSearchQuery && articleSearchQuery.trim().length >= 2 && article.simpleExplanation) {
+      if (article.simpleExplanation.toLowerCase().includes(articleSearchQuery.trim().toLowerCase())) {
+        setIsSimpleExplanationOpen(true);
+      }
+    }
+  }, [articleSearchQuery, article.simpleExplanation]);
 
   const getFocusStyle = (sectionId: string) => {
     if (!isFocusMode) return '';
@@ -624,6 +681,59 @@ export const ReaderArea: React.FC<ReaderAreaProps> = ({
               </div>
             )}
 
+            {/* In-Article Search Bar Panel */}
+            {isArticleSearchOpen && (
+              <div className="p-3.5 rounded-2xl border bg-amber-500/10 border-amber-500/30 dark:bg-neutral-900/90 shadow-md animate-fadeIn space-y-2">
+                <div className="flex items-center gap-2">
+                  <Search className="w-4 h-4 text-amber-600 dark:text-amber-400 flex-shrink-0" />
+                  <input
+                    id="input-article-search"
+                    type="text"
+                    value={articleSearchQuery}
+                    onChange={(e) => setArticleSearchQuery(e.target.value)}
+                    placeholder="Buscar palavra ou expressão dentro deste artigo..."
+                    className="flex-1 bg-white dark:bg-neutral-950 border border-neutral-300 dark:border-neutral-800 rounded-xl px-3 py-1.5 text-xs md:text-sm text-neutral-900 dark:text-neutral-100 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-amber-500/50"
+                  />
+                  {articleSearchQuery && (
+                    <button
+                      onClick={() => setArticleSearchQuery('')}
+                      className="p-1.5 rounded-lg text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200 cursor-pointer"
+                      title="Limpar texto de busca"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  )}
+                  <button
+                    onClick={() => {
+                      setIsArticleSearchOpen(false);
+                      setArticleSearchQuery('');
+                    }}
+                    className="px-2.5 py-1 rounded-lg bg-neutral-200 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-300 dark:hover:bg-neutral-700 text-xs font-semibold cursor-pointer"
+                  >
+                    Fechar
+                  </button>
+                </div>
+                {articleSearchQuery.trim().length >= 2 && (
+                  <div className="flex items-center justify-between text-[11px] text-neutral-600 dark:text-neutral-400 px-1 pt-0.5">
+                    <span>
+                      {getSearchMatchCount() > 0 ? (
+                        <span className="text-amber-700 dark:text-amber-300 font-bold">
+                          {getSearchMatchCount()} ocorrência(s) encontrada(s) e destacada(s)
+                        </span>
+                      ) : (
+                        <span className="text-neutral-500 italic">
+                          Nenhuma palavra correspondente encontrada neste artigo.
+                        </span>
+                      )}
+                    </span>
+                    <span className="text-[10px] text-neutral-400 hidden sm:inline">
+                      Destaque em amarelo no texto abaixo
+                    </span>
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* 1. TÍTULO */}
             <header 
               className={`border-b pb-4 border-neutral-200/80 dark:border-neutral-800 flex items-start justify-between gap-4 transition-all ${getFocusStyle('header')}`}
@@ -635,7 +745,7 @@ export const ReaderArea: React.FC<ReaderAreaProps> = ({
                   {article.code}
                 </span>
                 <h1 className="text-2xl md:text-3xl font-serif font-bold tracking-tight text-neutral-900 dark:text-neutral-100 mt-1">
-                  {article.title}
+                  {highlightMatch(article.title)}
                 </h1>
               </div>
 
@@ -740,6 +850,29 @@ export const ReaderArea: React.FC<ReaderAreaProps> = ({
                 >
                   <MapPin className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
                   <span className="hidden sm:inline">DPA (21 Províncias)</span>
+                </button>
+
+                {/* Busca no Artigo Quick Button */}
+                <button
+                  onClick={() => {
+                    setIsArticleSearchOpen(!isArticleSearchOpen);
+                    if (!isArticleSearchOpen) {
+                      setTimeout(() => {
+                        const input = document.getElementById('input-article-search');
+                        if (input) input.focus();
+                      }, 50);
+                    }
+                  }}
+                  id="btn-search-article"
+                  title="Buscar palavra-chave neste artigo (Destacar Texto)"
+                  className={`px-2.5 py-1.5 rounded-lg border transition-all flex items-center gap-1.5 text-xs font-bold cursor-pointer ${
+                    isArticleSearchOpen || articleSearchQuery
+                      ? 'bg-amber-600 text-white border-amber-600 shadow-md ring-2 ring-amber-500/30'
+                      : 'border-neutral-300 dark:border-neutral-800 text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-200'
+                  }`}
+                >
+                  <Search className="w-3.5 h-3.5 text-amber-500" />
+                  <span className="hidden sm:inline">Buscar</span>
                 </button>
 
                 {/* Modo Foco Quick Button */}
@@ -927,7 +1060,7 @@ export const ReaderArea: React.FC<ReaderAreaProps> = ({
                     : 'bg-neutral-50 border-neutral-200 text-neutral-900'
                 }`}
               >
-                {article.legalText || article.definition}
+                {highlightMatch(article.legalText || article.definition)}
               </div>
             </section>
 
@@ -957,7 +1090,7 @@ export const ReaderArea: React.FC<ReaderAreaProps> = ({
               {isSimpleExplanationOpen && (
                 <div className="p-4 pt-1 border-t border-amber-500/20 text-xs md:text-sm leading-relaxed text-neutral-800 dark:text-neutral-200 animate-in fade-in duration-150">
                   <p className="pl-3 border-l-2 border-amber-500/70">
-                    {article.simpleExplanation}
+                    {highlightMatch(article.simpleExplanation)}
                   </p>
                 </div>
               )}
@@ -985,7 +1118,7 @@ export const ReaderArea: React.FC<ReaderAreaProps> = ({
                     }`}
                   >
                     <span className="w-1.5 h-1.5 rounded-full bg-amber-500 flex-shrink-0 mt-2" />
-                    <span className="leading-relaxed">{point}</span>
+                    <span className="leading-relaxed">{highlightMatch(point)}</span>
                   </li>
                 ))}
               </ul>
@@ -1011,7 +1144,7 @@ export const ReaderArea: React.FC<ReaderAreaProps> = ({
                   }`}
                 >
                   <AlertTriangle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
-                  <p className="text-xs md:text-sm font-medium leading-relaxed">{article.examAlert}</p>
+                  <p className="text-xs md:text-sm font-medium leading-relaxed">{highlightMatch(article.examAlert)}</p>
                 </div>
               </section>
             )}

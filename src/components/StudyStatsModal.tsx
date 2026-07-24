@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   PieChart,
   Pie,
@@ -24,7 +24,8 @@ import {
   HelpCircle,
   BarChart2,
   Sparkles,
-  Target
+  Target,
+  AlertTriangle
 } from 'lucide-react';
 
 interface StudyStatsModalProps {
@@ -54,6 +55,9 @@ export const StudyStatsModal: React.FC<StudyStatsModalProps> = ({
 
   const isDark = theme === 'dark';
   const isSepia = theme === 'sepia';
+
+  // Module state for Chapter Completion Bar Chart
+  const [selectedChapterModuleId, setSelectedChapterModuleId] = useState<string>('minint');
 
   // Calculate statistics across all modules
   const statsData = useMemo(() => {
@@ -146,6 +150,49 @@ export const StudyStatsModal: React.FC<StudyStatsModalProps> = ({
       color: m.color
     }));
 
+    // Calculate Chapter Completion Breakdown for the Selected Module
+    const selectedChapterModuleObj =
+      ALL_MODULES.find(m => m.id === selectedChapterModuleId) || ALL_MODULES[1];
+
+    const chapterBreakdown = selectedChapterModuleObj.chapters.map((chap, idx) => {
+      const articles: any[] = [];
+      if (chap.articles) articles.push(...chap.articles);
+      if (chap.sections) {
+        chap.sections.forEach(sec => articles.push(...sec.articles));
+      }
+
+      const total = articles.length;
+      const studied = articles.filter(a => progress.studiedArticleIds.includes(a.id)).length;
+      const percentage = total > 0 ? Math.round((studied / total) * 100) : 0;
+
+      // Label for Chart X-Axis (e.g. "Cap. I", "Cap. II")
+      let code = `Cap. ${idx + 1}`;
+      if (chap.title.toLowerCase().startsWith('capítulo')) {
+        const match = chap.title.match(/Capítulo\s+([I|V|X|\d]+)/i);
+        if (match) code = `Cap. ${match[1]}`;
+      }
+
+      // Bar color based on dedication level required
+      let barColor = '#ef4444'; // Red (< 30%)
+      if (percentage >= 75) barColor = '#10b981'; // Green (>= 75%)
+      else if (percentage >= 50) barColor = '#f59e0b'; // Amber (50-74%)
+      else if (percentage > 0) barColor = '#f97316'; // Orange (1-49%)
+
+      return {
+        id: chap.id,
+        title: chap.title,
+        code,
+        total,
+        studied,
+        pending: total - studied,
+        percentage,
+        barColor,
+        needsDedication: percentage < 50
+      };
+    });
+
+    const chaptersNeedingDedication = chapterBreakdown.filter(c => c.needsDedication);
+
     return {
       globalTotalArticles,
       globalStudiedArticles,
@@ -157,9 +204,12 @@ export const StudyStatsModal: React.FC<StudyStatsModalProps> = ({
       moduleBreakdown,
       readingDonutData,
       quizDonutData,
-      moduleDonutData
+      moduleDonutData,
+      selectedChapterModuleObj,
+      chapterBreakdown,
+      chaptersNeedingDedication
     };
-  }, [progress, isDark]);
+  }, [progress, isDark, selectedChapterModuleId]);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 overflow-y-auto bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
@@ -428,6 +478,133 @@ export const StudyStatsModal: React.FC<StudyStatsModalProps> = ({
                 <span>Incorreções ({Math.max(0, statsData.totalQuizQuestions - statsData.totalQuizCorrect)})</span>
               </div>
             </div>
+          </div>
+        </div>
+
+        {/* Chapter Completion Bar Chart (Análise de Dedicação por Capítulo) */}
+        <div className={`p-5 sm:p-6 rounded-3xl border mb-8 ${
+          isDark ? 'bg-neutral-950/40 border-neutral-800' : isSepia ? 'bg-[#f3e8d2] border-[#dfd2b5]' : 'bg-neutral-50/80 border-neutral-200'
+        }`}>
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-4">
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="text-sm font-bold text-neutral-900 dark:text-neutral-100 flex items-center gap-2">
+                  <BarChart2 className="w-4 h-4 text-emerald-500" />
+                  Percentagem de Conclusão por Capítulo (% Recharts)
+                </h3>
+                <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-500/20 text-amber-700 dark:text-amber-300">
+                  {statsData.selectedChapterModuleObj.shortTitle}
+                </span>
+              </div>
+              <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
+                Percentagem de tópicos lidos em cada capítulo para identificar onde é necessária mais dedicação.
+              </p>
+            </div>
+
+            {/* Module Selector Pills */}
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0">
+              {ALL_MODULES.map(mod => (
+                <button
+                  key={mod.id}
+                  onClick={() => setSelectedChapterModuleId(mod.id)}
+                  className={`px-2.5 py-1 rounded-xl text-[11px] font-bold transition-all whitespace-nowrap cursor-pointer ${
+                    selectedChapterModuleId === mod.id
+                      ? 'bg-amber-600 text-white shadow-xs ring-2 ring-amber-500/30'
+                      : 'bg-neutral-200/70 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100'
+                  }`}
+                >
+                  {mod.shortTitle}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Recharts Bar Chart */}
+          <div className="h-64 w-full my-2">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart
+                data={statsData.chapterBreakdown}
+                margin={{ top: 20, right: 15, left: -20, bottom: 25 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" stroke={isDark ? '#262626' : '#e5e5e5'} vertical={false} />
+                <XAxis
+                  dataKey="code"
+                  tick={{ fill: isDark ? '#a3a3a3' : '#525252', fontSize: 11, fontWeight: 600 }}
+                  axisLine={{ stroke: isDark ? '#404040' : '#d4d4d4' }}
+                  interval={0}
+                  angle={-15}
+                  textAnchor="end"
+                />
+                <YAxis
+                  domain={[0, 100]}
+                  tickFormatter={(val) => `${val}%`}
+                  tick={{ fill: isDark ? '#a3a3a3' : '#525252', fontSize: 11 }}
+                  axisLine={{ stroke: isDark ? '#404040' : '#d4d4d4' }}
+                />
+                <Tooltip
+                  content={({ active, payload }) => {
+                    if (active && payload && payload.length) {
+                      const data = payload[0].payload;
+                      return (
+                        <div className={`p-3 rounded-2xl border shadow-xl text-xs max-w-xs ${
+                          isDark ? 'bg-neutral-900 border-neutral-700 text-neutral-100 shadow-black/80' : 'bg-white border-neutral-200 text-neutral-900'
+                        }`}>
+                          <p className="font-bold text-amber-600 dark:text-amber-400 mb-1">{data.code}: {data.title}</p>
+                          <p className="font-mono text-sm font-black mb-1" style={{ color: data.barColor }}>
+                            {data.percentage}% Concluído
+                          </p>
+                          <p className="text-[11px] text-neutral-500 dark:text-neutral-400">
+                            {data.studied} de {data.total} tópicos lidos ({data.pending} pendentes)
+                          </p>
+                          {data.needsDedication && (
+                            <div className="mt-2 pt-1.5 border-t border-rose-500/20 text-rose-600 dark:text-rose-400 font-bold flex items-center gap-1 text-[10px]">
+                              <AlertTriangle className="w-3.5 h-3.5 flex-shrink-0" />
+                              <span>Baixa conclusão (&lt;50%): Requer mais atenção!</span>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    }
+                    return null;
+                  }}
+                />
+                <Bar dataKey="percentage" name="Conclusão (%)" radius={[6, 6, 0, 0]}>
+                  {statsData.chapterBreakdown.map((entry, index) => (
+                    <Cell key={`chap-cell-${index}`} fill={entry.barColor} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+
+          {/* Dedication Legend & Alert Summary */}
+          <div className="mt-4 pt-3 border-t border-neutral-200/60 dark:border-neutral-800/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
+            <div className="flex items-center gap-4 text-[11px] font-medium flex-wrap">
+              <span className="flex items-center gap-1.5">
+                <span className="w-2.5 h-2.5 rounded-full bg-rose-500" />
+                <span className="text-neutral-600 dark:text-neutral-400">Alta Dedicação (&lt;50%)</span>
+              </span>
+              <span className="flex items-center gap-1.5">
+                <span className="w-2.5 h-2.5 rounded-full bg-amber-500" />
+                <span className="text-neutral-600 dark:text-neutral-400">Progresso Médio (50%-74%)</span>
+              </span>
+              <span className="flex items-center gap-1.5">
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
+                <span className="text-neutral-600 dark:text-neutral-400">Concluído (&ge;75%)</span>
+              </span>
+            </div>
+
+            {statsData.chaptersNeedingDedication.length > 0 ? (
+              <div className="px-3 py-1.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-700 dark:text-rose-400 font-bold text-[11px] flex items-center gap-1.5">
+                <AlertTriangle className="w-3.5 h-3.5 flex-shrink-0 text-rose-500" />
+                <span>{statsData.chaptersNeedingDedication.length} capítulo(s) precisam de mais atenção</span>
+              </div>
+            ) : (
+              <div className="px-3 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-700 dark:text-emerald-400 font-bold text-[11px] flex items-center gap-1.5">
+                <CheckCircle2 className="w-3.5 h-3.5 flex-shrink-0 text-emerald-500" />
+                <span>Excelente progresso em todos os capítulos!</span>
+              </div>
+            )}
           </div>
         </div>
 

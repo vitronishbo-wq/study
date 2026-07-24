@@ -12,67 +12,77 @@ export const minintModule: DiplomaModule = {
     {
       id: 'minint-dec-pre',
       title: 'Decreto Presidencial n.º 32/18 (Diploma de Aprovação)',
-      articles: [
+      sections: [
         {
-          id: 'minint-dec-art-1',
-          code: 'Artigo 1.º (Aprovação)',
-          title: 'Aprovação do Estatuto Orgânico do MININT',
-          legalText: 'É aprovado o Estatuto Orgânico do Ministério do Interior, anexo ao presente Decreto Presidencial e que dele é parte integrante.',
-          definition: 'Ato normativo presidencial que confere vigência jurídica ao Estatuto Orgânico do MININT.',
-          simpleExplanation: 'Este decreto assinado pelo Presidente da República aprova oficialmente as regras de funcionamento e organização do MININT.',
-          importantPoints: [
-            'Aprovado pelo Presidente da República, João Manuel Gonçalves Lourenço.',
-            'Entrou em vigor após apreciação pelo Conselho de Ministros.'
-          ],
-          examAlert: 'Questão de concurso: O Estatuto Orgânico do MININT foi aprovado pelo Decreto Presidencial n.º 32/18, de 7 de Fevereiro.',
-          questions: [
+          id: 'minint-sec-dec-1',
+          title: 'Secção I - Aprovação e Revogação do Regime Orgânico Anterior',
+          articles: [
             {
-              id: 'q-dec-1',
-              question: 'Qual o diploma legal que aprova o Estatuto Orgânico do Ministério do Interior em vigor?',
-              options: [
-                'Decreto Presidencial n.º 209/14, de 18 de Agosto.',
-                'Decreto Presidencial n.º 32/18, de 7 de Fevereiro.',
-                'Lei n.º 1/07, de 14 de Maio.',
-                'Decreto Executivo n.º 12/20.'
+              id: 'minint-dec-art-1',
+              code: 'Artigo 1.º (Aprovação)',
+              title: 'Aprovação do Estatuto Orgânico do MININT',
+              legalText: 'É aprovado o Estatuto Orgânico do Ministério do Interior, anexo ao presente Decreto Presidencial e que dele é parte integrante.',
+              definition: 'Ato normativo presidencial que confere vigência jurídica ao Estatuto Orgânico do MININT.',
+              simpleExplanation: 'Este decreto assinado pelo Presidente da República aprova oficialmente as regras de funcionamento e organização do MININT.',
+              importantPoints: [
+                'Aprovado pelo Presidente da República, João Manuel Gonçalves Lourenço.',
+                'Entrou em vigor após apreciação pelo Conselho de Ministros.'
               ],
-              correctAnswer: 1,
-              explanation: 'O Estatuto Orgânico do MININT foi aprovado pelo Decreto Presidencial n.º 32/18, de 7 de Fevereiro.',
-              examContext: 'Legislação Orgânica do MININT'
-            }
-          ],
-          flashcards: [
+              examAlert: 'Questão de concurso: O Estatuto Orgânico do MININT foi aprovado pelo Decreto Presidencial n.º 32/18, de 7 de Fevereiro.',
+              questions: [
+                {
+                  id: 'q-dec-1',
+                  question: 'Qual o diploma legal que aprova o Estatuto Orgânico do Ministério do Interior em vigor?',
+                  options: [
+                    'Decreto Presidencial n.º 209/14, de 18 de Agosto.',
+                    'Decreto Presidencial n.º 32/18, de 7 de Fevereiro.',
+                    'Lei n.º 1/07, de 14 de Maio.',
+                    'Decreto Executivo n.º 12/20.'
+                  ],
+                  correctAnswer: 1,
+                  explanation: 'O Estatuto Orgânico do MININT foi aprovado pelo Decreto Presidencial n.º 32/18, de 7 de Fevereiro.',
+                  examContext: 'Legislação Orgânica do MININT'
+                }
+              ],
+              flashcards: [
+                {
+                  id: 'fc-dec-1',
+                  front: 'Qual diploma aprova o Estatuto Orgânico do MININT?',
+                  back: 'Decreto Presidencial n.º 32/18, de 7 de Fevereiro.',
+                  articleRef: 'Artigo 1.º do Decreto Presidencial n.º 32/18'
+                }
+              ]
+            },
             {
-              id: 'fc-dec-1',
-              front: 'Qual diploma aprova o Estatuto Orgânico do MININT?',
-              back: 'Decreto Presidencial n.º 32/18, de 7 de Fevereiro.',
-              articleRef: 'Artigo 1.º do Decreto Presidencial n.º 32/18'
+              id: 'minint-dec-art-2',
+              code: 'Artigo 2.º (Revogação)',
+              title: 'Revogação do Diploma Anterior',
+              legalText: 'É revogada toda a legislação que contrarie o presente Diploma, nomeadamente o Decreto Presidencial n.º 209/14, de 18 de Agosto.',
+              definition: 'Norma de revogação expressa do regime jurídico orgânico anterior.',
+              simpleExplanation: 'O Decreto Presidencial n.º 32/18 substituiu integralmente o antigo diploma (Decreto Presidencial n.º 209/14).',
+              importantPoints: [
+                'Revogação expressa do Decreto Presidencial n.º 209/14.',
+                'Eliminação de normas anteriores incompatíveis.'
+              ],
+              questions: [],
+              flashcards: []
             }
           ]
-        },
-        {
-          id: 'minint-dec-art-2',
-          code: 'Artigo 2.º (Revogação)',
-          title: 'Revogação do Diploma Anterior',
-          legalText: 'É revogada toda a legislação que contrarie o presente Diploma, nomeadamente o Decreto Presidencial n.º 209/14, de 18 de Agosto.',
-          definition: 'Norma de revogação expressa do regime jurídico orgânico anterior.',
-          simpleExplanation: 'O Decreto Presidencial n.º 32/18 substituiu integralmente o antigo diploma (Decreto Presidencial n.º 209/14).',
-          importantPoints: [
-            'Revogação expressa do Decreto Presidencial n.º 209/14.',
-            'Eliminação de normas anteriores incompatíveis.'
-          ],
-          questions: [],
-          flashcards: []
         }
       ]
     },
     {
       id: 'minint-cap-1',
       title: 'Capítulo I – Disposições Gerais',
-      articles: [
+      sections: [
         {
-          id: 'minint-art-1',
-          code: 'Artigo 1.º',
-          title: 'Natureza do Ministério do Interior',
+          id: 'minint-sec-1-1',
+          title: 'Secção I – Natureza, Atribuições e Princípios do MININT',
+          articles: [
+            {
+              id: 'minint-art-1',
+              code: 'Artigo 1.º',
+              title: 'Natureza do Ministério do Interior',
           legalText: 'O Ministério do Interior, abreviadamente designado por «MININT», é o Departamento Ministerial que tem por missão propor a formulação, coordenar, executar e avaliar a política do Executivo, relativa à ordem interna e à segurança pública, assim como assegurar a inspecção e a fiscalização da actuação e desenvolvimento da administração da Polícia Nacional, do Serviço de Investigação Criminal, do Serviço de Migração e Estrangeiros, do Serviço Penitenciário e do Serviço de Protecção Civil e Bombeiros, com vista a garantir a ordem, a segurança e tranquilidade públicas.',
           definition: 'Departamento Ministerial responsável pela formulação, execução e fiscalização da política de ordem interna e segurança pública.',
           simpleExplanation: 'O MININT é o ministério encarregado de gerir e fiscalizar as forças de segurança interna: Polícia Nacional, SIC, SME, Prisões e Bombeiros.',
@@ -215,13 +225,19 @@ l) Da lealdade às instituições e entidades públicas.
           flashcards: []
         }
       ]
-    },
+    }
+  ]
+},
     {
       id: 'minint-cap-2',
       title: 'Capítulo II – Organização em Geral',
-      articles: [
+      sections: [
         {
-          id: 'minint-art-4',
+          id: 'minint-sec-2-1',
+          title: 'Secção I – Estrutura Orgânica e Mapeamento dos Serviços Executivos Diretos',
+          articles: [
+            {
+              id: 'minint-art-4',
           code: 'Artigo 4.º',
           title: 'Estrutura Orgânica e Mapeamento dos 5 Serviços Executivos Directos',
           legalText: `A estrutura orgânica do Ministério do Interior compreende os seguintes órgãos e serviços:
@@ -295,13 +311,19 @@ b) Corpo de Conselheiros.
           ]
         }
       ]
-    },
+    }
+  ]
+},
     {
       id: 'minint-cap-3',
       title: 'Capítulo III – Organização em Especial',
-      articles: [
+      sections: [
         {
-          id: 'minint-art-5',
+          id: 'minint-sec-3-1',
+          title: 'Secção I – Direcção Superior, Órgãos Executivos e Serviços Centrais',
+          articles: [
+            {
+              id: 'minint-art-5',
           code: 'Artigo 5.º a 10.º',
           title: 'Direcção e Competências do Ministro e Secretários de Estado',
           legalText: 'O Ministério do Interior é dirigido pelo Ministro do Interior, coadjuvado por Secretários de Estado. O Ministro exerce poderes de direcção, superintendência, intervenção, tutela substitutiva, revogatória e sancionatória sobre os serviços. No exercício de competências externas, exara Decretos Executivos e Despachos; internamente, emite Ordens de Serviço, Circulares e Directivas.',
@@ -628,4 +650,6 @@ b) Corpo de Conselheiros.
       ]
     }
   ]
+}
+]
 };

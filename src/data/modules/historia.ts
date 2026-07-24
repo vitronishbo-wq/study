@@ -22,6 +22,7 @@ export const historiaModule: DiplomaModule = {
               code: 'Tema 1',
               title: 'O Inicio da Luta Armada de Libertação Nacional (4 de Fevereiro de 1961)',
               definition: 'Início da insurreição armada contra o domínio colonial português em Luanda.',
+              legalText: 'No dia 4 de Fevereiro de 1961, um grupo de patriotas angolanos armados maioritariamente com catanas e instrumentos tradicionais desencadeou o assalto à Casa de Reclusão Militar, à Cadeia de São Paulo e ao Posto Policial da 7.ª Esquadra em Luanda, com o objetivo de libertar os presos políticos detidos pelo regime colonialista português. Este ato de bravura histórica assinalou o início formal da Luta Armada de Libertação Nacional, que culminou com a conquista da Independência de Angola.',
               simpleExplanation: 'No dia 4 de Fevereiro de 1961, patriotas angolanos armados com catanas atacaram as prisões coloniais em Luanda para libertar presos políticos, marcando o início da luta armada de libertação nacional.',
               importantPoints: [
                 'Data histórica celebrada como Dia do Início da Luta Armada de Libertação Nacional.',
@@ -58,6 +59,7 @@ export const historiaModule: DiplomaModule = {
               code: 'Tema 2',
               title: 'Proclamação da Independência Nacional (11 de Novembro de 1975)',
               definition: 'Surgimento da República Popular de Angola como Estado soberano e livre.',
+              legalText: 'Às zero horas do dia 11 de Novembro de 1975, na Praça da Independência em Luanda, o Fundador da Nação, Dr. António Agostinho Neto, proclamou solenemente perante África e o Mundo a Independência Nacional e a criação da República Popular de Angola (hoje República de Angola). O ato pôs fim a cerca de cinco séculos de dominação colonial e restabeleceu a dignidade e soberania do Povo Angolano sobre o seu próprio território.',
               simpleExplanation: 'À meia-noite do dia 11 de Novembro de 1975, o Dr. António Agostinho Neto proclamou em Luanda a Independência de Angola perante África e o Mundo.',
               importantPoints: [
                 'António Agostinho Neto tornou-se o Primeiro Presidente da República de Angola e Herói Nacional.',
@@ -106,6 +108,7 @@ export const historiaModule: DiplomaModule = {
               code: 'Tema 3',
               title: 'O Memorando de Entendimento do Luena e o Dia da Paz (4 de Abril)',
               definition: 'Fim definitivo do conflito armado em Angola e consolidação da Paz Definitiva.',
+              legalText: 'No dia 4 de Abril de 2002, foi assinado no Palácio dos Congressos em Luanda (na sequência dos acordos militares do Luena) o Memorando de Entendimento Complementar ao Protocolo de Lusaka entre as Chefias Militares das Forças Armadas Angolanas (FAA) e as Forças Militares da UNITA. A assinatura deste documento histórico pôs fim definitivo ao longo conflito armado civil, consagrou a reconciliação nacional, a desmilitarização e a consolidação da paz e unidade territorial em todo o País.',
               simpleExplanation: 'A 4 de Abril de 2002 foi assinado o Memorando de Entendimento na cidade do Luena entre as FAA e as Forças Militares da UNITA, pondo fim à guerra civil e unificando a nação.',
               importantPoints: [
                 '4 de Abril: Dia da Paz e da Reconciliação Nacional.',

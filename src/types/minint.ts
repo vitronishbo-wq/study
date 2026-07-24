@@ -25,8 +25,10 @@ export interface ConceptArticle {
   simpleExplanation: string;
   importantPoints: string[];
   examAlert?: string; // "Atenção para exame"
-  questions: ExamQuestion[];
-  flashcards: Flashcard[];
+  keywords?: string[];
+  relatedArticleIds?: string[];
+  questions?: ExamQuestion[];
+  flashcards?: Flashcard[];
 }
 
 export interface Section {
