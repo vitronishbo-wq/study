@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { ALL_MODULES, getAllArticlesInModule } from '../data';
 import { ModuleId } from '../types/minint';
+import { useVitronisAuth } from '../hooks/useVitronisAuth';
 import {
   BookMarked,
   Shield,
@@ -14,7 +15,12 @@ import {
   X,
   CheckCircle2,
   TrendingUp,
-  Award
+  Award,
+  UserCheck,
+  LogIn,
+  LogOut,
+  User as UserIcon,
+  ExternalLink
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -49,6 +55,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const isDark = theme === 'dark';
   const isSepia = theme === 'sepia';
   const [showStats, setShowStats] = useState(false);
+  const [showProfile, setShowProfile] = useState(false);
+  const { user, isAuthenticated, login, logout } = useVitronisAuth();
 
   // Compute stats per module and globally
   const moduleStats = useMemo(() => {
