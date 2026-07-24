@@ -64,6 +64,17 @@ export interface AiQuizQuestion {
   explanation: string;
 }
 
+export interface SmartQuizQuestion {
+  id: string;
+  scenarioType?: 'caso_pratico' | 'pegadinha_rasteira' | 'artigo_direto';
+  question: string;
+  options: string[];
+  correctAnswer: number;
+  explanation: string;
+  distractorExplanations?: string[]; // Explanations why other options are wrong
+  examTip?: string; // "Dica de Ouro de Concurso"
+}
+
 export interface UserProgress {
   studiedArticleIds: string[];
   bookmarkedArticleIds: string[];

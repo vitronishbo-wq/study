@@ -1,17 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { ConceptArticle, DiplomaModule, StudyMode } from '../types/minint';
+import { ConceptArticle, DiplomaModule, StudyMode, ModuleId } from '../types/minint';
 import { SummaryView } from './SummaryView';
 import { FlashcardView } from './FlashcardView';
 import { QuestionPractice } from './QuestionPractice';
-import { ArticleAiQuiz } from './ArticleAiQuiz';
+import { SmartQuiz } from './SmartQuiz';
 import { AudioPlayer } from './AudioPlayer';
 import { DpaModal } from './DpaModal';
 import { DPAReferencePanel } from './DPAReferencePanel';
+import { MobileQuickPicker } from './MobileQuickPicker';
 import {
   CheckCircle2,
   Bookmark,
   ChevronRight,
   ChevronLeft,
+  ChevronDown,
+  ChevronUp,
   AlertTriangle,
   HelpCircle,
   BookOpen,
@@ -32,7 +35,11 @@ import {
   Pause,
   Square,
   MapPin,
-  Menu
+  Menu,
+  Compass,
+  Eye,
+  Target,
+  Focus
 } from 'lucide-react';
 
 interface ReaderAreaProps {
@@ -58,6 +65,9 @@ interface ReaderAreaProps {
   onSaveQuizScore?: (correct: number, total: number) => void;
   explorerOpen?: boolean;
   onToggleExplorer?: () => void;
+  onSelectArticle?: (moduleId: ModuleId, articleId: string) => void;
+  studiedArticleIds?: string[];
+  onImmersiveScrollChange?: (isBarsVisible: boolean) => void;
 }
 
 export const ReaderArea: React.FC<ReaderAreaProps> = ({
@@ -82,13 +92,99 @@ export const ReaderArea: React.FC<ReaderAreaProps> = ({
   hasPrev,
   onSaveQuizScore,
   explorerOpen,
-  onToggleExplorer
+  onToggleExplorer,
+  onSelectArticle,
+  studiedArticleIds = [],
+  onImmersiveScrollChange
 }) => {
   const [activeMode, setActiveMode] = useState<StudyMode>('reading');
   const [showInlineQuestionAnswer, setShowInlineQuestionAnswer] = useState(false);
   const [notesOpen, setNotesOpen] = useState(false);
   const [noteText, setNoteText] = useState(articleNote);
   const [isDpaModalOpen, setIsDpaModalOpen] = useState(false);
+  const [isMobileQuickPickerOpen, setIsMobileQuickPickerOpen] = useState(false);
+  const [isSimpleExplanationOpen, setIsSimpleExplanationOpen] = useState(false);
+
+  // Modo Foco State (Reading mask blur & active paragraph highlight)
+  const [isFocusMode, setIsFocusMode] = useState(false);
+  const [focusedSectionId, setFocusedSectionId] = useState<string>('legalText');
+
+  const getFocusStyle = (sectionId: string) => {
+    if (!isFocusMode) return '';
+    const isFocused = focusedSectionId === sectionId;
+    return isFocused
+      ? 'ring-2 ring-amber-500/90 shadow-xl scale-[1.01] transition-all duration-300 z-10 opacity-100 backdrop-blur-none bg-white dark:bg-neutral-900 rounded-xl p-2 -m-2'
+      : 'filter blur-[2.5px] opacity-30 grayscale-[30%] hover:blur-none hover:opacity-100 hover:grayscale-0 transition-all duration-300 cursor-pointer';
+  };
+
+  // Touch Swipe Navigation State (Left -> Next Article, Right -> Prev Article)
+  const [touchStartX, setTouchStartX] = useState<number | null>(null);
+  const contentScrollRef = React.useRef<HTMLDivElement>(null);
+
+  // Immersive Reading State (auto-hide toolbars on scroll down, reveal on scroll up)
+  const [isBarsVisible, setIsBarsVisible] = useState(true);
+  const lastScrollTopRef = React.useRef(0);
+
+  // Scroll content area directly into view/top when selected article changes
+  useEffect(() => {
+    if (contentScrollRef.current) {
+      contentScrollRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    setIsBarsVisible(true);
+    lastScrollTopRef.current = 0;
+    if (onImmersiveScrollChange) onImmersiveScrollChange(true);
+  }, [article.id, activeMode, onImmersiveScrollChange]);
+
+  // Immersive Scroll Listener
+  useEffect(() => {
+    const scrollContainer = contentScrollRef.current;
+    if (!scrollContainer) return;
+
+    const handleScroll = () => {
+      const currentScrollTop = scrollContainer.scrollTop;
+      const scrollDelta = currentScrollTop - lastScrollTopRef.current;
+
+      // Threshold of 8px to prevent jitter
+      if (Math.abs(scrollDelta) > 8) {
+        if (scrollDelta > 0 && currentScrollTop > 40) {
+          // Scrolling down -> hide toolbars & footer
+          setIsBarsVisible(false);
+          if (onImmersiveScrollChange) onImmersiveScrollChange(false);
+        } else if (scrollDelta < 0 || currentScrollTop <= 20) {
+          // Scrolling up or at top -> reveal toolbars & footer
+          setIsBarsVisible(true);
+          if (onImmersiveScrollChange) onImmersiveScrollChange(true);
+        }
+        lastScrollTopRef.current = currentScrollTop;
+      }
+    };
+
+    scrollContainer.addEventListener('scroll', handleScroll, { passive: true });
+    return () => {
+      scrollContainer.removeEventListener('scroll', handleScroll);
+    };
+  }, [onImmersiveScrollChange]);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchStartX(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX === null) return;
+    const touchEndX = e.changedTouches[0].clientX;
+    const diffX = touchStartX - touchEndX;
+
+    // Swipe Left (distance > 60px) -> Next Article
+    if (diffX > 60 && hasNext) {
+      onNextArticle();
+    }
+    // Swipe Right (distance < -60px) -> Prev Article
+    else if (diffX < -60 && hasPrev) {
+      onPrevArticle();
+    }
+
+    setTouchStartX(null);
+  };
 
   // Sync internal note text when article changes or external prop changes
   useEffect(() => {
@@ -257,9 +353,28 @@ export const ReaderArea: React.FC<ReaderAreaProps> = ({
           : 'bg-white text-neutral-900'
       }`}
     >
+      {/* Immersive Mode Quick Trigger Floating Button */}
+      {!isBarsVisible && (
+        <button
+          onClick={() => {
+            setIsBarsVisible(true);
+            if (onImmersiveScrollChange) onImmersiveScrollChange(true);
+          }}
+          className="fixed top-3 right-4 z-40 px-3 py-1.5 rounded-full bg-amber-600/90 hover:bg-amber-600 text-white font-bold text-[11px] shadow-lg backdrop-blur-md flex items-center gap-1.5 animate-fadeIn transition-all cursor-pointer opacity-90 hover:opacity-100"
+          title="Exibir barras de ferramentas e rodapé"
+        >
+          <Eye className="w-3.5 h-3.5 text-white" />
+          <span>Leitura Imersiva (Exibir)</span>
+        </button>
+      )}
+
       {/* Discreet Reader Bar Options */}
       <div
-        className={`px-3 md:px-6 py-2.5 md:py-3 border-b flex items-center justify-between gap-2.5 md:gap-4 select-none ${
+        className={`px-3 md:px-6 border-b flex items-center justify-between gap-2.5 md:gap-4 select-none transition-all duration-300 ease-in-out z-20 ${
+          isBarsVisible
+            ? 'py-2.5 md:py-3 max-h-28 opacity-100 translate-y-0'
+            : 'py-0 max-h-0 opacity-0 -translate-y-full overflow-hidden border-b-0 pointer-events-none'
+        } ${
           isDark
             ? 'bg-neutral-900/80 border-neutral-800'
             : isSepia
@@ -267,29 +382,32 @@ export const ReaderArea: React.FC<ReaderAreaProps> = ({
             : 'bg-neutral-50 border-neutral-200'
         }`}
       >
-        {/* Mobile Navigation Toggle Button & Breadcrumb Info */}
-        <div className="flex items-center gap-2 truncate text-xs text-neutral-500 dark:text-neutral-400 min-w-0">
+        {/* Mobile Navigation Toggle Button & Breadcrumb Selector Info (Padrão Bíblia) */}
+        <div className="flex items-center gap-1.5 truncate text-xs text-neutral-500 dark:text-neutral-400 min-w-0">
           {onToggleExplorer && (
             <button
               id="btn-mobile-toggle-explorer"
               onClick={onToggleExplorer}
-              className="md:hidden flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-amber-500/30 bg-amber-500/10 text-amber-800 dark:text-amber-300 font-bold text-xs hover:bg-amber-500/20 transition-all flex-shrink-0 cursor-pointer shadow-2xs"
-              title={explorerOpen ? 'Recolher Menu' : 'Abrir Módulos e Conteúdos'}
+              className="md:hidden flex items-center gap-1 px-2 py-1 rounded-lg border border-amber-500/30 bg-amber-500/10 text-amber-800 dark:text-amber-300 font-bold text-xs hover:bg-amber-500/20 transition-all flex-shrink-0 cursor-pointer shadow-2xs"
+              title={explorerOpen ? 'Recolher Menu' : 'Abrir Módulos'}
             >
-              <Menu className="w-4 h-4 text-amber-600 dark:text-amber-400" />
-              <span>Módulos</span>
+              <Menu className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+              <span>Menu</span>
             </button>
           )}
 
-          <span className="font-semibold text-neutral-800 dark:text-neutral-200 truncate">{moduleData.shortTitle}</span>
-          <span>›</span>
-          <span className="truncate hidden sm:inline">{chapterTitle}</span>
-          {sectionTitle && (
-            <>
-              <span className="hidden sm:inline">›</span>
-              <span className="truncate hidden md:inline">{sectionTitle}</span>
-            </>
-          )}
+          {/* Quick Breadcrumb Article Picker Button (Bíblia Style) */}
+          <button
+            onClick={() => setIsMobileQuickPickerOpen(true)}
+            className="flex items-center gap-1 px-2 py-1 rounded-lg border border-neutral-300/80 dark:border-neutral-700 bg-neutral-100/80 dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 font-semibold hover:border-amber-500 transition-all truncate text-xs cursor-pointer shadow-2xs"
+            title="Navegação Rápida de Artigos"
+          >
+            <Compass className="w-3.5 h-3.5 text-amber-500 flex-shrink-0" />
+            <span className="truncate font-bold text-amber-700 dark:text-amber-400">{moduleData.code}</span>
+            <span>›</span>
+            <span className="truncate font-mono">{article.code}</span>
+            <ChevronDown className="w-3 h-3 text-neutral-400 flex-shrink-0" />
+          </button>
         </div>
 
         {/* Study Mode Selector Pills */}
@@ -361,12 +479,29 @@ export const ReaderArea: React.FC<ReaderAreaProps> = ({
             }`}
           >
             <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-            <span>Quiz IA (3 Questões)</span>
+            <span>Smart Quiz IA MININT</span>
           </button>
         </div>
 
-        {/* Text Size & Typography Controls */}
+        {/* Text Size & Typography & Focus Mode Controls */}
         <div className="hidden lg:flex items-center gap-2">
+          {/* Modo Foco Toggle */}
+          <button
+            onClick={() => {
+              setIsFocusMode(!isFocusMode);
+              if (!isFocusMode) setFocusedSectionId('legalText');
+            }}
+            title={isFocusMode ? "Desativar Modo Foco" : "Ativar Modo Foco (Máscara de Leitura e Destaque de Texto)"}
+            className={`px-2.5 py-1 rounded-md text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
+              isFocusMode
+                ? 'bg-amber-600 text-white font-bold shadow-xs'
+                : 'bg-neutral-200/50 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700'
+            }`}
+          >
+            <Target className={`w-3.5 h-3.5 ${isFocusMode ? 'animate-pulse text-amber-200' : 'text-amber-500'}`} />
+            <span>{isFocusMode ? 'Modo Foco ON' : 'Modo Foco'}</span>
+          </button>
+
           {/* Typography Family */}
           <div className="flex items-center bg-neutral-200/50 dark:bg-neutral-800 rounded-md p-0.5 text-[11px]">
             <button
@@ -415,8 +550,13 @@ export const ReaderArea: React.FC<ReaderAreaProps> = ({
         </div>
       </div>
 
-      {/* Main Content Scroll Container */}
-      <div className="flex-1 overflow-y-auto px-6 py-8 md:px-12 lg:px-20">
+      {/* Main Content Scroll Container (with Touch Swipe Article Navigation) */}
+      <div 
+        ref={contentScrollRef}
+        className="flex-1 overflow-y-auto px-4 py-6 sm:px-6 sm:py-8 md:px-12 lg:px-20"
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+      >
         {activeMode === 'summary' && (
           <SummaryView
             article={article}
@@ -446,7 +586,7 @@ export const ReaderArea: React.FC<ReaderAreaProps> = ({
         )}
 
         {activeMode === 'quiz_ai' && (
-          <ArticleAiQuiz
+          <SmartQuiz
             article={article}
             theme={theme}
             onSaveQuizScore={onSaveQuizScore}
@@ -465,8 +605,31 @@ export const ReaderArea: React.FC<ReaderAreaProps> = ({
               onOpenFullModal={() => setIsDpaModalOpen(true)}
             />
 
+            {/* Modo Foco Active Banner */}
+            {isFocusMode && (
+              <div className="p-3.5 rounded-2xl bg-amber-500/15 border border-amber-500/40 text-amber-900 dark:text-amber-200 flex items-center justify-between gap-3 text-xs shadow-sm animate-fadeIn">
+                <div className="flex items-center gap-2">
+                  <Target className="w-4 h-4 text-amber-600 dark:text-amber-400 animate-pulse flex-shrink-0" />
+                  <div>
+                    <strong className="font-bold">Modo Foco Ativo:</strong>
+                    <span className="ml-1 opacity-90">Passe o cursor ou toque no parágrafo/bloco para focar. O restante permanece em máscara de leitura.</span>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setIsFocusMode(false)}
+                  className="px-2.5 py-1 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-bold text-[11px] flex items-center gap-1 cursor-pointer flex-shrink-0"
+                >
+                  <X className="w-3.5 h-3.5" /> Sair do Foco
+                </button>
+              </div>
+            )}
+
             {/* 1. TÍTULO */}
-            <header className="border-b pb-4 border-neutral-200/80 dark:border-neutral-800 flex items-start justify-between gap-4">
+            <header 
+              className={`border-b pb-4 border-neutral-200/80 dark:border-neutral-800 flex items-start justify-between gap-4 transition-all ${getFocusStyle('header')}`}
+              onMouseEnter={() => isFocusMode && setFocusedSectionId('header')}
+              onClick={() => isFocusMode && setFocusedSectionId('header')}
+            >
               <div>
                 <span className="text-xs font-mono font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">
                   {article.code}
@@ -577,6 +740,24 @@ export const ReaderArea: React.FC<ReaderAreaProps> = ({
                 >
                   <MapPin className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
                   <span className="hidden sm:inline">DPA (21 Províncias)</span>
+                </button>
+
+                {/* Modo Foco Quick Button */}
+                <button
+                  onClick={() => {
+                    setIsFocusMode(!isFocusMode);
+                    if (!isFocusMode) setFocusedSectionId('legalText');
+                  }}
+                  id="btn-modo-foco"
+                  title={isFocusMode ? "Desativar Modo Foco" : "Ativar Modo Foco (Máscara de Leitura e Destaque)"}
+                  className={`px-2.5 py-1.5 rounded-lg border transition-all flex items-center gap-1.5 text-xs font-bold cursor-pointer ${
+                    isFocusMode
+                      ? 'bg-amber-600 text-white border-amber-600 shadow-md ring-2 ring-amber-500/30'
+                      : 'border-neutral-300 dark:border-neutral-800 text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-200'
+                  }`}
+                >
+                  <Target className={`w-3.5 h-3.5 ${isFocusMode ? 'text-amber-200 animate-pulse' : 'text-amber-500'}`} />
+                  <span className="hidden sm:inline">{isFocusMode ? 'Foco ON' : 'Modo Foco'}</span>
                 </button>
 
                 {/* Audio Reader TTS Quick Button */}
@@ -729,7 +910,11 @@ export const ReaderArea: React.FC<ReaderAreaProps> = ({
             )}
 
             {/* 2. DEFINIÇÃO / TEXTO LEGAL COMPLETO */}
-            <section className="space-y-2">
+            <section 
+              className={`space-y-2 transition-all ${getFocusStyle('legalText')}`}
+              onMouseEnter={() => isFocusMode && setFocusedSectionId('legalText')}
+              onClick={() => isFocusMode && setFocusedSectionId('legalText')}
+            >
               <h2 className="text-xs font-semibold uppercase tracking-wider text-neutral-400 dark:text-neutral-500">
                 {article.legalText ? 'Texto Legal Oficial (Diploma Integra)' : 'Definição e Conceito Base'}
               </h2>
@@ -746,20 +931,44 @@ export const ReaderArea: React.FC<ReaderAreaProps> = ({
               </div>
             </section>
 
-            {/* 3. EXPLICAÇÃO SIMPLES */}
-            <section className="space-y-2">
-              <h2 className="text-xs font-semibold uppercase tracking-wider text-neutral-400 dark:text-neutral-500">
-                Explicação Simples
-              </h2>
-              <p
-                className={`${fontSizeClasses} text-neutral-800 dark:text-neutral-300 bg-transparent pl-3 border-l-2 border-amber-500/70`}
+            {/* 3. EXPLICAÇÃO SIMPLES (Accordion Colapsável - Padrão Móvel) */}
+            <section 
+              className={`space-y-2 border rounded-xl overflow-hidden border-amber-500/30 bg-amber-500/5 transition-all ${getFocusStyle('simpleExplanation')}`}
+              onMouseEnter={() => isFocusMode && setFocusedSectionId('simpleExplanation')}
+              onClick={() => isFocusMode && setFocusedSectionId('simpleExplanation')}
+            >
+              <button
+                onClick={() => setIsSimpleExplanationOpen(!isSimpleExplanationOpen)}
+                className="w-full p-3.5 flex items-center justify-between text-left hover:bg-amber-500/10 transition-all cursor-pointer"
               >
-                {article.simpleExplanation}
-              </p>
+                <div className="flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-amber-500" />
+                  <span className="text-xs font-bold uppercase tracking-wider text-amber-800 dark:text-amber-300">
+                    Explicação Simples em Linguagem Clara
+                  </span>
+                </div>
+                {isSimpleExplanationOpen ? (
+                  <ChevronUp className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+                ) : (
+                  <ChevronDown className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+                )}
+              </button>
+
+              {isSimpleExplanationOpen && (
+                <div className="p-4 pt-1 border-t border-amber-500/20 text-xs md:text-sm leading-relaxed text-neutral-800 dark:text-neutral-200 animate-in fade-in duration-150">
+                  <p className="pl-3 border-l-2 border-amber-500/70">
+                    {article.simpleExplanation}
+                  </p>
+                </div>
+              )}
             </section>
 
             {/* 4. PONTOS IMPORTANTES */}
-            <section className="space-y-2">
+            <section 
+              className={`space-y-2 transition-all ${getFocusStyle('importantPoints')}`}
+              onMouseEnter={() => isFocusMode && setFocusedSectionId('importantPoints')}
+              onClick={() => isFocusMode && setFocusedSectionId('importantPoints')}
+            >
               <h2 className="text-xs font-semibold uppercase tracking-wider text-neutral-400 dark:text-neutral-500">
                 Pontos Importantes
               </h2>
@@ -784,7 +993,11 @@ export const ReaderArea: React.FC<ReaderAreaProps> = ({
 
             {/* 5. ATENÇÃO PARA EXAME */}
             {article.examAlert && (
-              <section className="space-y-2">
+              <section 
+                className={`space-y-2 transition-all ${getFocusStyle('examAlert')}`}
+                onMouseEnter={() => isFocusMode && setFocusedSectionId('examAlert')}
+                onClick={() => isFocusMode && setFocusedSectionId('examAlert')}
+              >
                 <h2 className="text-xs font-semibold uppercase tracking-wider text-amber-600 dark:text-amber-400">
                   Atenção para Exame
                 </h2>
@@ -805,7 +1018,11 @@ export const ReaderArea: React.FC<ReaderAreaProps> = ({
 
             {/* 6. QUESTÃO E MOSTRAR RESPOSTA */}
             {inlineQuestion && (
-              <section className="space-y-3 pt-4 border-t border-neutral-200 dark:border-neutral-800">
+              <section 
+                className={`space-y-3 pt-4 border-t border-neutral-200 dark:border-neutral-800 transition-all ${getFocusStyle('inlineQuestion')}`}
+                onMouseEnter={() => isFocusMode && setFocusedSectionId('inlineQuestion')}
+                onClick={() => isFocusMode && setFocusedSectionId('inlineQuestion')}
+              >
                 <h2 className="text-xs font-semibold uppercase tracking-wider text-neutral-400 dark:text-neutral-500">
                   Questão Prática de Fixação
                 </h2>
@@ -862,20 +1079,20 @@ export const ReaderArea: React.FC<ReaderAreaProps> = ({
               </section>
             )}
 
-            {/* 6.5. QUIZ RÁPIDO GERADO COM IA (GEMINI) */}
+            {/* 6.5. SMART QUIZ ADAPTATIVO GERADO COM IA (GEMINI) */}
             <section className="space-y-3 pt-6 border-t border-neutral-200 dark:border-neutral-800">
               <div className="flex items-center justify-between">
                 <h2 className="text-xs font-semibold uppercase tracking-wider text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
-                  <Sparkles className="w-3.5 h-3.5" /> Quiz Rápido Gemini IA
+                  <Sparkles className="w-3.5 h-3.5" /> Smart Quiz Gemini IA (Concurso MININT)
                 </h2>
                 <button
                   onClick={() => setActiveMode('quiz_ai')}
                   className="text-xs font-bold text-amber-700 dark:text-amber-400 hover:underline flex items-center gap-1 cursor-pointer"
                 >
-                  Modo Quiz Exclusivo <ChevronRight className="w-3.5 h-3.5" />
+                  Modo Quiz Adaptativo <ChevronRight className="w-3.5 h-3.5" />
                 </button>
               </div>
-              <ArticleAiQuiz
+              <SmartQuiz
                 article={article}
                 theme={theme}
                 onSaveQuizScore={onSaveQuizScore}
@@ -910,6 +1127,106 @@ export const ReaderArea: React.FC<ReaderAreaProps> = ({
         onClose={() => setIsDpaModalOpen(false)}
         theme={theme}
       />
+
+      {/* MOBILE BOTTOM NAVIGATION TOOLBAR (Barra de Ações Rápidas em Baixo - Smartphones) */}
+      <nav
+        id="mobile-bottom-action-bar"
+        className={`md:hidden sticky bottom-0 left-0 right-0 border-t z-30 px-3 py-2 flex items-center justify-around gap-1 backdrop-blur-md shadow-lg select-none transition-all duration-300 ease-in-out ${
+          isBarsVisible
+            ? 'translate-y-0 opacity-100 pointer-events-auto'
+            : 'translate-y-full opacity-0 pointer-events-none'
+        } ${
+          isDark
+            ? 'bg-neutral-900/95 border-neutral-800 text-neutral-300'
+            : isSepia
+            ? 'bg-[#f4ebd7]/95 border-[#ded0b1] text-[#3b2d1d]'
+            : 'bg-white/95 border-neutral-200 text-neutral-700'
+        }`}
+      >
+        <button
+          onClick={() => setIsMobileQuickPickerOpen(true)}
+          className="flex flex-col items-center gap-1 text-[10px] font-medium hover:text-amber-500 transition-colors cursor-pointer"
+        >
+          <Compass className="w-5 h-5 text-amber-500" />
+          <span>Artigos</span>
+        </button>
+
+        <button
+          onClick={() => {
+            setIsFocusMode(!isFocusMode);
+            if (!isFocusMode) setFocusedSectionId('legalText');
+          }}
+          className={`flex flex-col items-center gap-1 text-[10px] font-medium transition-colors cursor-pointer ${
+            isFocusMode ? 'text-amber-500 font-bold' : 'hover:text-amber-500'
+          }`}
+        >
+          <Target className="w-5 h-5 text-amber-500" />
+          <span>{isFocusMode ? 'Foco ON' : 'Foco'}</span>
+        </button>
+
+        {ttsSupported && (
+          <button
+            onClick={isTtsPlaying ? handlePauseTts : handlePlayTts}
+            className={`flex flex-col items-center gap-1 text-[10px] font-medium transition-colors cursor-pointer ${
+              isTtsPlaying ? 'text-amber-500 font-bold animate-pulse' : 'hover:text-amber-500'
+            }`}
+          >
+            <Volume2 className="w-5 h-5" />
+            <span>{isTtsPlaying ? 'Pausar' : 'Ouvir'}</span>
+          </button>
+        )}
+
+        <button
+          onClick={() => setNotesOpen(!notesOpen)}
+          className={`flex flex-col items-center gap-1 text-[10px] font-medium transition-colors cursor-pointer ${
+            noteText.trim().length > 0 ? 'text-amber-500 font-bold' : 'hover:text-amber-500'
+          }`}
+        >
+          <StickyNote className="w-5 h-5" />
+          <span>Anotações</span>
+        </button>
+
+        <button
+          onClick={() => setIsDpaModalOpen(true)}
+          className="flex flex-col items-center gap-1 text-[10px] font-medium hover:text-amber-500 transition-colors cursor-pointer"
+        >
+          <MapPin className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+          <span>DPA</span>
+        </button>
+
+        <button
+          onClick={onToggleBookmark}
+          className={`flex flex-col items-center gap-1 text-[10px] font-medium transition-colors cursor-pointer ${
+            isBookmarked ? 'text-amber-500 font-bold' : 'hover:text-amber-500'
+          }`}
+        >
+          <Bookmark className={`w-5 h-5 ${isBookmarked ? 'fill-current' : ''}`} />
+          <span>Favorito</span>
+        </button>
+
+        <button
+          onClick={onToggleStudied}
+          className={`flex flex-col items-center gap-1 text-[10px] font-medium transition-colors cursor-pointer ${
+            isStudied ? 'text-emerald-500 font-bold' : 'hover:text-amber-500'
+          }`}
+        >
+          <CheckCircle2 className="w-5 h-5" />
+          <span>Estudado</span>
+        </button>
+      </nav>
+
+      {/* MOBILE QUICK PICKER MODAL */}
+      {onSelectArticle && (
+        <MobileQuickPicker
+          isOpen={isMobileQuickPickerOpen}
+          onClose={() => setIsMobileQuickPickerOpen(false)}
+          activeModuleId={moduleData.id}
+          activeArticleId={article.id}
+          onSelectArticle={onSelectArticle}
+          studiedArticleIds={studiedArticleIds}
+          theme={theme}
+        />
+      )}
     </main>
   );
 };

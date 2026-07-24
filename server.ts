@@ -161,6 +161,98 @@ Instruções estritas:
   }
 });
 
+// Endpoint de Quiz Adaptativo Inteligente (Smart Quiz Gemini para Concurso MININT)
+app.post("/api/quiz/generate-smart", async (req, res) => {
+  try {
+    const { articleCode, articleTitle, content, difficulty = 'concurso_minint', scenarioStyle = 'misto' } = req.body;
+    if (!content) {
+      return res.status(400).json({ error: "Conteúdo do artigo não foi fornecido." });
+    }
+
+    let difficultyInstruction = "Crie questões de nível de EXAME DE CONCURSO PÚBLICO MININT / PNA / SIC / SME com casuística prática, raciocínio jurídico e cenários realistas da Polícia e Segurança em Angola.";
+    if (difficulty === 'iniciante') {
+      difficultyInstruction = "Crie questões diretas e conceituais de nível inicial para memorização dos termos principais e conceitos base do artigo.";
+    } else if (difficulty === 'intermediario') {
+      difficultyInstruction = "Crie questões de nível intermediário que exijam análise de competências, prazos e aplicação de regras legais.";
+    }
+
+    let styleInstruction = "Misture casos práticos situacionais, análise de pegadinhas jurídicas e interpretação estrita do diploma.";
+    if (scenarioStyle === 'caso_pratico') {
+      styleInstruction = "Formule TODAS as perguntas na forma de CASOS PRÁTICOS SITUACIONAIS de atuação policial, administrativa ou de investigação em Angola (ex: 'Durante uma operação do Serviço de Investigação Criminal em Luanda...').";
+    } else if (scenarioStyle === 'pegadinha_rasteira') {
+      styleInstruction = "Foque em PEGADINHAS TÍPICAS DE CONCURSO (prazos inversos, substituição de palavras 'deve/pode', competências trocadas ou exceções não previstas).";
+    }
+
+    const prompt = `Gere EXATAMENTE 3 perguntas de alto nível para preparação para o Concurso do Ministério do Interior (MININT) de Angola, baseando-se ESTREITAMENTE e EXCLUSIVAMENTE no seguinte artigo legal:
+
+ARTIGO: "${articleCode} - ${articleTitle}"
+CONTEÚDO OFICIAL:
+---
+${content}
+---
+
+NÍVEL DE DIFICULDADE: ${difficulty} (${difficultyInstruction})
+ESTILO DE QUESTÃO: ${scenarioStyle} (${styleInstruction})
+
+DIRETRIZES OBRIGATÓRIAS:
+1. Crie 3 questões de escolha múltipla (4 opções A, B, C, D).
+2. Não faça perguntas genéricas ou simplistas. Escreva enunciados elaborados, contextualizados e profissionais.
+3. Para cada questão, indique:
+   - "scenarioType": "caso_pratico" ou "pegadinha_rasteira" ou "artigo_direto"
+   - "question": Enunciado completo e contextualizado.
+   - "options": Lista de 4 opções plausíveis.
+   - "correctAnswer": Índice (0, 1, 2 ou 3).
+   - "explanation": Fundamentação jurídica minuciosa baseada no texto do artigo.
+   - "distractorExplanations": Lista com 4 textos explicando brevemente o motivo de cada uma das opções (A, B, C, D) ser correta ou incorreta.
+   - "examTip": Uma "Dica de Ouro de Concurso" destacando a pegadinha ou palavra-chave a memorizar.`;
+
+    const response = await ai.models.generateContent({
+      model: "gemini-3.6-flash",
+      contents: prompt,
+      config: {
+        systemInstruction: "Você é o Presidente do Júri de Elaboração de Provas do Concurso Público de Admissão ao Ministério do Interior (MININT) de Angola. Crie questões autênticas, rigorosas, juridicamente impecáveis e pedagógicas.",
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: Type.OBJECT,
+          properties: {
+            questions: {
+              type: Type.ARRAY,
+              items: {
+                type: Type.OBJECT,
+                properties: {
+                  id: { type: Type.STRING },
+                  scenarioType: { type: Type.STRING },
+                  question: { type: Type.STRING },
+                  options: {
+                    type: Type.ARRAY,
+                    items: { type: Type.STRING }
+                  },
+                  correctAnswer: { type: Type.INTEGER },
+                  explanation: { type: Type.STRING },
+                  distractorExplanations: {
+                    type: Type.ARRAY,
+                    items: { type: Type.STRING }
+                  },
+                  examTip: { type: Type.STRING }
+                },
+                required: ["id", "question", "options", "correctAnswer", "explanation"]
+              }
+            }
+          },
+          required: ["questions"]
+        }
+      }
+    });
+
+    const jsonText = response.text || "{}";
+    const data = JSON.parse(jsonText);
+    res.json(data);
+  } catch (error: any) {
+    console.error("Erro ao gerar Smart Quiz com Gemini:", error);
+    res.status(500).json({ error: "Erro ao gerar Smart Quiz Adaptativo. Tente novamente." });
+  }
+});
+
 // Endpoint to validate a specific answer with Gemini explanation
 app.post("/api/quiz/validate", async (req, res) => {
   try {

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { ConceptArticle, Flashcard } from '../types/minint';
+import { useLocalFlashcards } from '../hooks/useLocalFlashcards';
 import {
   RotateCw,
   ChevronLeft,
@@ -16,7 +17,9 @@ import {
   FileText,
   Loader2,
   Layers,
-  Award
+  Award,
+  Plus,
+  BookmarkCheck
 } from 'lucide-react';
 
 interface FlashcardViewProps {
@@ -42,6 +45,8 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
   const [isAiLoading, setIsAiLoading] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
   const [geminiCards, setGeminiCards] = useState<ExtractedFlashcard[]>([]);
+
+  const { addCard, isSaved } = useLocalFlashcards();
 
   const isDark = theme === 'dark';
   const isSepia = theme === 'sepia';
@@ -491,17 +496,48 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
           </button>
         </div>
 
-        <button
-          onClick={() => toggleMastered(currentCard.id)}
-          className={`px-5 py-2.5 text-xs font-bold rounded-xl border flex items-center gap-1.5 transition-all shadow-xs cursor-pointer ${
-            isMastered
-              ? 'bg-emerald-600 text-white border-emerald-600 hover:bg-emerald-700'
-              : 'border-neutral-300 dark:border-neutral-700 text-neutral-700 dark:text-neutral-200 hover:border-emerald-500 hover:text-emerald-600'
-          }`}
-        >
-          <Check className="w-4 h-4" />
-          {isMastered ? 'Cartão Dominado ✓' : 'Marcar como Dominado'}
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => toggleMastered(currentCard.id)}
+            className={`px-4 py-2.5 text-xs font-bold rounded-xl border flex items-center gap-1.5 transition-all shadow-xs cursor-pointer ${
+              isMastered
+                ? 'bg-emerald-600 text-white border-emerald-600 hover:bg-emerald-700'
+                : 'border-neutral-300 dark:border-neutral-700 text-neutral-700 dark:text-neutral-200 hover:border-emerald-500 hover:text-emerald-600'
+            }`}
+          >
+            <Check className="w-4 h-4" />
+            {isMastered ? 'Dominado ✓' : 'Dominado'}
+          </button>
+
+          <button
+            onClick={() => {
+              addCard({
+                id: currentCard.id,
+                front: currentCard.front,
+                back: currentCard.back,
+                articleCode: currentCard.articleRef || article.code,
+                articleTitle: article.title,
+                tag: currentCard.tag || 'Flashcard'
+              });
+            }}
+            disabled={isSaved(currentCard.id, currentCard.front, currentCard.articleRef || article.code)}
+            className={`px-4 py-2.5 text-xs font-bold rounded-xl border flex items-center gap-1.5 transition-all shadow-xs cursor-pointer ${
+              isSaved(currentCard.id, currentCard.front, currentCard.articleRef || article.code)
+                ? 'bg-amber-500/20 text-amber-800 dark:text-amber-300 border-amber-300 dark:border-amber-700'
+                : 'bg-amber-600 hover:bg-amber-700 text-white border-amber-600'
+            }`}
+          >
+            {isSaved(currentCard.id, currentCard.front, currentCard.articleRef || article.code) ? (
+              <>
+                <BookmarkCheck className="w-4 h-4" /> Salvo no Deck
+              </>
+            ) : (
+              <>
+                <Plus className="w-4 h-4" /> Salvar no Deck
+              </>
+            )}
+          </button>
+        </div>
 
         <button
           onClick={handleNext}

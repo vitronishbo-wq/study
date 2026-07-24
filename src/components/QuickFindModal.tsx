@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { ALL_MODULES } from '../data';
 import { ConceptArticle, DiplomaModule, ModuleId } from '../types/minint';
-import { Search, Command, X, Check, BookOpen, ArrowRight } from 'lucide-react';
+import { Search, Command, X, Check, ArrowRight } from 'lucide-react';
 
 interface QuickFindModalProps {
   isOpen: boolean;
@@ -18,6 +18,139 @@ const normalizeText = (text: string): string => {
     .toLowerCase()
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '');
+};
+
+/**
+ * Visually highlight matching query text segments within original text, preserving original casing & accents.
+ */
+const highlightMatches = (text: string, query: string): React.ReactNode => {
+  if (!text) return '';
+  const trimmedQuery = query.trim();
+  if (!trimmedQuery) return text;
+
+  const normText = normalizeText(text);
+  const normQuery = normalizeText(trimmedQuery);
+
+  // Split tokens by space
+  const tokens = normQuery.split(/\s+/).filter(Boolean);
+  if (tokens.length === 0) return text;
+
+  // Find all match character ranges [start, end]
+  const matches: [number, number][] = [];
+  const sortedTokens = [...tokens].sort((a, b) => b.length - a.length);
+
+  sortedTokens.forEach(token => {
+    let pos = 0;
+    while ((pos = normText.indexOf(token, pos)) !== -1) {
+      matches.push([pos, pos + token.length]);
+      pos += Math.max(1, token.length);
+    }
+  });
+
+  if (matches.length === 0) return text;
+
+  // Merge overlapping or adjacent ranges
+  matches.sort((a, b) => a[0] - b[0]);
+  const merged: [number, number][] = [];
+  matches.forEach(range => {
+    if (merged.length === 0) {
+      merged.push(range);
+    } else {
+      const last = merged[merged.length - 1];
+      if (range[0] <= last[1]) {
+        last[1] = Math.max(last[1], range[1]);
+      } else {
+        merged.push(range);
+      }
+    }
+  });
+
+  // Construct highlighted nodes
+  const nodes: React.ReactNode[] = [];
+  let lastIdx = 0;
+
+  merged.forEach(([start, end], i) => {
+    if (start > lastIdx) {
+      nodes.push(text.slice(lastIdx, start));
+    }
+    nodes.push(
+      <mark
+        key={`match-${i}`}
+        className="bg-amber-400/40 text-amber-950 dark:text-amber-200 font-bold px-0.5 rounded shadow-2xs"
+      >
+        {text.slice(start, end)}
+      </mark>
+    );
+    lastIdx = end;
+  });
+
+  if (lastIdx < text.length) {
+    nodes.push(text.slice(lastIdx));
+  }
+
+  return <>{nodes}</>;
+};
+
+/**
+ * Truncate snippet text around the match location so the keyword is visible
+ */
+const truncateAroundMatch = (text: string, query: string, maxLength = 130): string => {
+  if (!text) return '';
+  if (text.length <= maxLength) return text;
+
+  const normText = normalizeText(text);
+  const normQuery = normalizeText(query.trim());
+
+  if (!normQuery) return text.slice(0, maxLength) + '...';
+
+  const firstToken = normQuery.split(/\s+/)[0] || normQuery;
+  const idx = normText.indexOf(firstToken);
+
+  if (idx === -1) {
+    return text.slice(0, maxLength) + '...';
+  }
+
+  const start = Math.max(0, idx - 30);
+  const end = Math.min(text.length, idx + firstToken.length + 80);
+
+  let snippet = text.slice(start, end);
+  if (start > 0) snippet = '...' + snippet;
+  if (end < text.length) snippet = snippet + '...';
+
+  return snippet;
+};
+
+/**
+ * Select the best snippet string from an article for a given query
+ */
+const getBestSnippet = (art: ConceptArticle, query: string): string => {
+  const normQuery = normalizeText(query.trim());
+  if (!normQuery) return art.simpleExplanation || art.definition || art.legalText || '';
+
+  const candidates = [
+    art.simpleExplanation,
+    art.definition,
+    art.legalText,
+    art.examAlert,
+    ...(art.importantPoints || [])
+  ].filter(Boolean) as string[];
+
+  for (const cand of candidates) {
+    if (normalizeText(cand).includes(normQuery)) {
+      return truncateAroundMatch(cand, query);
+    }
+  }
+
+  // Token fallback
+  const tokens = normQuery.split(/\s+/).filter(Boolean);
+  for (const cand of candidates) {
+    const normCand = normalizeText(cand);
+    if (tokens.some(tok => normCand.includes(tok))) {
+      return truncateAroundMatch(cand, query);
+    }
+  }
+
+  return truncateAroundMatch(art.simpleExplanation || art.definition || art.legalText || '', query);
 };
 
 interface SearchResultItem {
@@ -38,6 +171,7 @@ export const QuickFindModal: React.FC<QuickFindModalProps> = ({
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
+  const itemRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
   const isDark = theme === 'dark';
   const isSepia = theme === 'sepia';
@@ -53,8 +187,8 @@ export const QuickFindModal: React.FC<QuickFindModalProps> = ({
     }
   }, [isOpen]);
 
-  // Compute search results across all modules using prioritized fuzzy ranking algorithm
-  const results: SearchResultItem[] = React.useMemo(() => {
+  // Compute search results across all modules using prioritized ranking algorithm
+  const results: SearchResultItem[] = useMemo(() => {
     const rawTrimmed = query.trim();
     if (!rawTrimmed) return [];
 
@@ -84,16 +218,16 @@ export const QuickFindModal: React.FC<QuickFindModalProps> = ({
 
           let score = 0;
 
-          // 1. ARTICLE CODE NUMERIC MATCHING (Highest priority - instant 1-2 keystroke jump)
+          // 1. ARTICLE CODE NUMERIC MATCHING
           if (queryDigits && codeDigits.length > 0) {
             if (codeDigits.includes(queryDigits)) {
               if (codeDigits[0] === queryDigits) {
-                score += 3000; // Primary article number exact match (e.g. "15" -> "Artigo 15.º")
+                score += 3000;
               } else {
-                score += 2400; // Number range or secondary match (e.g. "5 a 10")
+                score += 2400;
               }
             } else if (codeDigits.some(d => d.startsWith(queryDigits))) {
-              score += 1200; // Prefix digits match (e.g. "1" -> "15")
+              score += 1200;
             }
           }
 
@@ -140,11 +274,11 @@ export const QuickFindModal: React.FC<QuickFindModalProps> = ({
             });
 
             if (matchedCount === queryTokens.length) {
-              score += 500; // All search tokens present!
+              score += 500;
             } else if (matchedCount > 0) {
               score += matchedCount * 80;
             } else {
-              score = 0; // If multi-word query and none matched
+              score = 0;
             }
           }
 
@@ -171,9 +305,18 @@ export const QuickFindModal: React.FC<QuickFindModalProps> = ({
       });
     });
 
-    // Sort results by score descending, then by module/article order
     return scoredItems.sort((a, b) => b.score - a.score);
   }, [query]);
+
+  // Ensure selected result item is smoothly scrolled into view inside search results list
+  useEffect(() => {
+    if (itemRefs.current[selectedIndex]) {
+      itemRefs.current[selectedIndex]?.scrollIntoView({
+        block: 'nearest',
+        behavior: 'smooth'
+      });
+    }
+  }, [selectedIndex]);
 
   // Handle keyboard navigation inside search results
   useEffect(() => {
@@ -233,7 +376,7 @@ export const QuickFindModal: React.FC<QuickFindModalProps> = ({
               setSelectedIndex(0);
             }}
             placeholder="Busca Rápida (ex: 'Artigo 207', 'PNA', 'Independência', 'Pena de morte')..."
-            className={`w-full text-sm font-medium bg-transparent outline-none placeholder-neutral-400 dark:placeholder-neutral-500`}
+            className="w-full text-sm font-medium bg-transparent outline-none placeholder-neutral-400 dark:placeholder-neutral-500"
           />
           <button
             onClick={onClose}
@@ -271,16 +414,18 @@ export const QuickFindModal: React.FC<QuickFindModalProps> = ({
             results.map((res, idx) => {
               const isSelected = idx === selectedIndex;
               const isStudied = studiedArticleIds.includes(res.article.id);
+              const snippetText = getBestSnippet(res.article, query);
 
               return (
                 <button
                   key={`${res.module.id}-${res.article.id}-${idx}`}
+                  ref={el => { itemRefs.current[idx] = el; }}
                   onClick={() => {
                     onSelectResult(res.module.id, res.article.id);
                     onClose();
                   }}
                   onMouseEnter={() => setSelectedIndex(idx)}
-                  className={`w-full text-left p-3 rounded-xl border transition-all flex items-start justify-between gap-3 ${
+                  className={`w-full text-left p-3 rounded-xl border transition-all flex items-start justify-between gap-3 cursor-pointer ${
                     isSelected
                       ? isDark
                         ? 'bg-amber-950/70 border-amber-500/50 text-neutral-100'
@@ -301,13 +446,15 @@ export const QuickFindModal: React.FC<QuickFindModalProps> = ({
 
                     <div className="flex items-center gap-2 font-semibold text-xs md:text-sm">
                       <span className="font-mono text-amber-500 dark:text-amber-400 flex-shrink-0">
-                        {res.article.code}
+                        {highlightMatches(res.article.code, query)}
                       </span>
-                      <span className="truncate">{res.article.title}</span>
+                      <span className="truncate">
+                        {highlightMatches(res.article.title, query)}
+                      </span>
                     </div>
 
-                    <p className={`text-xs line-clamp-2 leading-relaxed opacity-80 ${isSelected ? 'text-neutral-200' : 'text-neutral-600 dark:text-neutral-400'}`}>
-                      {res.article.simpleExplanation || res.article.definition}
+                    <p className={`text-xs line-clamp-2 leading-relaxed opacity-90 ${isSelected ? 'text-neutral-200' : 'text-neutral-600 dark:text-neutral-400'}`}>
+                      {highlightMatches(snippetText, query)}
                     </p>
                   </div>
 
