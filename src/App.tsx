@@ -5,19 +5,31 @@ import { useStudyState } from './hooks/useStudyState';
 import { Sidebar } from './components/Sidebar';
 import { Explorer } from './components/Explorer';
 import { ReaderArea } from './components/ReaderArea';
+import { HomePortal } from './components/HomePortal';
 import { StatusBar } from './components/StatusBar';
 import { QuickFindModal } from './components/QuickFindModal';
 import { StudyStatsModal } from './components/StudyStatsModal';
-import { ChevronRight, Menu, BookOpen, Layers } from 'lucide-react';
+import { SettingsModal } from './components/SettingsModal';
+import { ChevronRight, Menu, BookOpen, Layers, Building2, ArrowLeft } from 'lucide-react';
+import { initSearchDatabase } from './lib/indexedDbSearch';
 
 export default function App() {
+  const [viewMode, setViewMode] = useState<'portal' | 'reader'>('portal');
   const [activeModuleId, setActiveModuleId] = useState<ModuleId>('constituição');
   const [activeArticleId, setActiveArticleId] = useState<string | null>(null);
-  // Default explorerOpen to false on smartphones (< 768px) for clean YouVersion text reading
+  // Default explorerOpen to false on smartphones (< 768px) for clean text reading
   const [explorerOpen, setExplorerOpen] = useState(() => typeof window !== 'undefined' ? window.innerWidth >= 768 : false);
   const [quickFindOpen, setQuickFindOpen] = useState(false);
   const [statsModalOpen, setStatsModalOpen] = useState(false);
+  const [settingsModalOpen, setSettingsModalOpen] = useState(false);
   const [isBarsVisible, setIsBarsVisible] = useState(true);
+
+  // Initialize IndexedDB search database on app launch
+  useEffect(() => {
+    initSearchDatabase().catch(err => {
+      console.log('IndexedDB search warm-up note:', err);
+    });
+  }, []);
 
   const {
     progress,
@@ -110,6 +122,7 @@ export default function App() {
   const handleSelectQuickFindResult = (moduleId: ModuleId, articleId: string) => {
     setActiveModuleId(moduleId);
     setActiveArticleId(articleId);
+    setViewMode('reader');
   };
 
   // Touch Swipe Gesture State for Mobile Drawer (Left Edge Swipe to Open, Drawer Swipe Left to Close)
@@ -187,24 +200,35 @@ export default function App() {
         <div className="hidden md:flex flex-shrink-0 h-full">
           <Sidebar
             activeModuleId={activeModuleId}
-            onSelectModule={setActiveModuleId}
+            onSelectModule={(mId) => {
+              setActiveModuleId(mId);
+              setViewMode('reader');
+            }}
             studiedArticleIds={progress.studiedArticleIds}
             theme={progress.theme}
             onToggleTheme={handleToggleTheme}
             explorerOpen={explorerOpen}
             onToggleExplorer={() => setExplorerOpen(!explorerOpen)}
             onOpenStatsModal={() => setStatsModalOpen(true)}
+            onOpenHomePortal={() => setViewMode('portal')}
+            isHomeActive={viewMode === 'portal'}
           />
         </div>
 
-        {/* DESKTOP EXPLORER (Collapsible panel on md+ screens) */}
-        {explorerOpen && (
+        {/* DESKTOP EXPLORER (Collapsible panel on md+ screens when in reader view) */}
+        {explorerOpen && viewMode === 'reader' && (
           <div className="hidden md:flex flex-shrink-0 h-full">
             <Explorer
               moduleData={currentModule}
               activeArticleId={activeArticle?.id || null}
-              onSelectArticle={setActiveArticleId}
-              onSelectModule={setActiveModuleId}
+              onSelectArticle={(artId) => {
+                setActiveArticleId(artId);
+                setViewMode('reader');
+              }}
+              onSelectModule={(mId) => {
+                setActiveModuleId(mId);
+                setViewMode('reader');
+              }}
               studiedArticleIds={progress.studiedArticleIds}
               theme={progress.theme}
               onCloseExplorer={() => setExplorerOpen(false)}
@@ -221,13 +245,22 @@ export default function App() {
         >
           <Sidebar
             activeModuleId={activeModuleId}
-            onSelectModule={setActiveModuleId}
+            onSelectModule={(mId) => {
+              setActiveModuleId(mId);
+              setViewMode('reader');
+              setExplorerOpen(false);
+            }}
             studiedArticleIds={progress.studiedArticleIds}
             theme={progress.theme}
             onToggleTheme={handleToggleTheme}
             explorerOpen={explorerOpen}
             onToggleExplorer={() => setExplorerOpen(!explorerOpen)}
             onOpenStatsModal={() => setStatsModalOpen(true)}
+            onOpenHomePortal={() => {
+              setViewMode('portal');
+              setExplorerOpen(false);
+            }}
+            isHomeActive={viewMode === 'portal'}
           />
 
           <Explorer
@@ -235,47 +268,82 @@ export default function App() {
             activeArticleId={activeArticle?.id || null}
             onSelectArticle={(artId) => {
               setActiveArticleId(artId);
+              setViewMode('reader');
               setExplorerOpen(false); // Auto-close drawer on smartphone selection
             }}
-            onSelectModule={setActiveModuleId}
+            onSelectModule={(mId) => {
+              setActiveModuleId(mId);
+              setViewMode('reader');
+              setExplorerOpen(false);
+            }}
             studiedArticleIds={progress.studiedArticleIds}
             theme={progress.theme}
             onCloseExplorer={() => setExplorerOpen(false)}
           />
         </div>
 
-        {/* 3. ÁREA PRINCIPAL (>85% Screen Digital Book) */}
-        {activeArticle ? (
-          <ReaderArea
-            moduleData={currentModule}
-            article={activeArticle}
-            chapterTitle={articleDetail?.chapterTitle || ''}
-            sectionTitle={articleDetail?.sectionTitle}
-            theme={progress.theme}
-            fontSize={progress.fontSize}
-            onChangeFontSize={setFontSize}
-            fontFamily={progress.fontFamily}
-            onChangeFontFamily={setFontFamily}
-            isStudied={progress.studiedArticleIds.includes(activeArticle.id)}
-            onToggleStudied={() => toggleStudied(activeArticle.id)}
-            isBookmarked={progress.bookmarkedArticleIds.includes(activeArticle.id)}
-            onToggleBookmark={() => toggleBookmark(activeArticle.id)}
-            articleNote={progress.notesByArticleId[activeArticle.id] || ''}
-            onSaveNote={(noteText) => saveNote(activeArticle.id, noteText)}
-            onNextArticle={handleNextArticle}
-            onPrevArticle={handlePrevArticle}
-            hasNext={hasNext}
-            hasPrev={hasPrev}
-            onSaveQuizScore={(corr, tot) => saveQuizScore(activeArticle.id, corr, tot)}
-            explorerOpen={explorerOpen}
-            onToggleExplorer={() => setExplorerOpen(!explorerOpen)}
-            onSelectArticle={(mId, aId) => {
+        {/* 3. MAIN AREA: PORTAL HOME OR DIGITAL READER */}
+        {viewMode === 'portal' ? (
+          <HomePortal
+            onSelectModule={(mId, aId) => {
               setActiveModuleId(mId);
-              setActiveArticleId(aId);
+              if (aId) setActiveArticleId(aId);
+              setViewMode('reader');
             }}
-            studiedArticleIds={progress.studiedArticleIds}
-            onImmersiveScrollChange={setIsBarsVisible}
+            progress={progress}
+            theme={progress.theme}
+            onOpenQuickFind={() => setQuickFindOpen(true)}
+            onOpenStatsModal={() => setStatsModalOpen(true)}
           />
+        ) : activeArticle ? (
+          <div className="flex-1 flex flex-col overflow-hidden">
+            {/* Top Bar for Returning to Portal Home */}
+            <div className="px-4 py-2 border-b bg-neutral-900/90 border-neutral-800 text-neutral-200 text-xs flex items-center justify-between z-10 shadow-xs">
+              <button
+                onClick={() => setViewMode('portal')}
+                className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-300 font-bold hover:bg-amber-500/30 transition-all cursor-pointer"
+              >
+                <ArrowLeft className="w-3.5 h-3.5" />
+                <span>Página Inicial (Academia)</span>
+              </button>
+              <div className="flex items-center gap-2 font-mono text-[11px] text-amber-400">
+                <Building2 className="w-3.5 h-3.5" />
+                <span className="font-bold hidden sm:inline">Academia das Carreiras Públicas</span>
+              </div>
+            </div>
+
+            <ReaderArea
+              moduleData={currentModule}
+              article={activeArticle}
+              chapterTitle={articleDetail?.chapterTitle || ''}
+              sectionTitle={articleDetail?.sectionTitle}
+              theme={progress.theme}
+              fontSize={progress.fontSize}
+              onChangeFontSize={setFontSize}
+              fontFamily={progress.fontFamily}
+              onChangeFontFamily={setFontFamily}
+              isStudied={progress.studiedArticleIds.includes(activeArticle.id)}
+              onToggleStudied={() => toggleStudied(activeArticle.id)}
+              isBookmarked={progress.bookmarkedArticleIds.includes(activeArticle.id)}
+              onToggleBookmark={() => toggleBookmark(activeArticle.id)}
+              articleNote={progress.notesByArticleId[activeArticle.id] || ''}
+              onSaveNote={(noteText) => saveNote(activeArticle.id, noteText)}
+              onNextArticle={handleNextArticle}
+              onPrevArticle={handlePrevArticle}
+              hasNext={hasNext}
+              hasPrev={hasPrev}
+              onSaveQuizScore={(corr, tot) => saveQuizScore(activeArticle.id, corr, tot)}
+              explorerOpen={explorerOpen}
+              onToggleExplorer={() => setExplorerOpen(!explorerOpen)}
+              onSelectArticle={(mId, aId) => {
+                setActiveModuleId(mId);
+                setActiveArticleId(aId);
+                setViewMode('reader');
+              }}
+              studiedArticleIds={progress.studiedArticleIds}
+              onImmersiveScrollChange={setIsBarsVisible}
+            />
+          </div>
         ) : (
           <div className="flex-1 flex items-center justify-center p-8 text-neutral-400">
             Selecione um capítulo no explorador para iniciar a leitura.
@@ -301,6 +369,7 @@ export default function App() {
           theme={progress.theme}
           onOpenQuickFind={() => setQuickFindOpen(true)}
           onOpenStatsModal={() => setStatsModalOpen(true)}
+          onOpenSettingsModal={() => setSettingsModalOpen(true)}
           onToggleExplorer={() => setExplorerOpen(!explorerOpen)}
         />
       </div>
@@ -321,6 +390,13 @@ export default function App() {
         progress={progress}
         theme={progress.theme}
         onSelectModule={(mId) => setActiveModuleId(mId as ModuleId)}
+      />
+
+      {/* 7. PAINEL DE DEFINIÇÕES & SINCRONIZAÇÃO */}
+      <SettingsModal
+        isOpen={settingsModalOpen}
+        onClose={() => setSettingsModalOpen(false)}
+        theme={progress.theme}
       />
     </div>
   );

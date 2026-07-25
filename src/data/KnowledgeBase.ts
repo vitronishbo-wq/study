@@ -80,7 +80,7 @@ export function getEnrichedModules(): DiplomaModule[] {
     const enrichedChapters = mod.chapters.map(chap => {
       const enrichArticle = (art: ConceptArticle): EnrichedConceptArticle => ({
         ...art,
-        legalText: art.legalText || `${art.code} - ${art.title}\n\nTexto oficial integral do diploma aplicável ao Ministério do Interior e órgãos constitutivos da República de Angola.`,
+        legalText: art.legalText || `${art.code} - ${art.title}\n\nTexto oficial integral do diploma aplicável aos concursos da Administração Pública e Carreiras do Estado Angolano.`,
         definition: art.definition || 'Enquadramento doutrinário e normativo do preceito legal.',
         simpleExplanation: art.simpleExplanation || 'Exposição didática e resumida para fácil retenção em exames.',
         importantPoints: art.importantPoints && art.importantPoints.length > 0 ? art.importantPoints : [art.title],

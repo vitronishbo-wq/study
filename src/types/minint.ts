@@ -1,4 +1,28 @@
-export type ModuleId = 'constituição' | 'minint' | 'policia' | 'historia' | 'cultura_geral';
+export type ModuleId =
+  | 'constituição'
+  | 'minint'
+  | 'policia'
+  | 'historia'
+  | 'cultura_geral'
+  | 'portugues'
+  | 'matematica'
+  | 'informatica'
+  | 'etica'
+  | 'administracao_publica'
+  | 'legislacao'
+  | 'raciocinio_logico';
+
+export interface MinistryConcurso {
+  id: string;
+  ministryName: string;
+  shortName: string;
+  iconName: string;
+  badge: string;
+  description: string;
+  targetCareers: string[];
+  moduleIds: ModuleId[];
+  keyTopics: string[];
+}
 
 export interface Flashcard {
   id: string;
@@ -86,3 +110,73 @@ export interface UserProgress {
   fontFamily: 'sans' | 'serif' | 'mono';
   theme: 'light' | 'dark' | 'sepia';
 }
+
+// ----------------------------------------------------------------------------
+// 15. ESTRUTURA E ARQUITETURA PARA EVOLUÇÃO FUTURA
+// (Cursos, Certificados, Vídeos, Aulas, Documentos, Novos Concursos)
+// ----------------------------------------------------------------------------
+
+export interface VideoLesson {
+  id: string;
+  title: string;
+  durationMinutes: number;
+  videoUrl?: string;
+  summary: string;
+  instructorName?: string;
+  articleRefId?: string;
+}
+
+export interface Course {
+  id: string;
+  title: string;
+  category: string;
+  description: string;
+  instructor: string;
+  durationHours: number;
+  lessons: VideoLesson[];
+  certificateEligible: boolean;
+  coverImage?: string;
+}
+
+export interface Certificate {
+  id: string;
+  code: string;
+  title: string;
+  recipientName: string;
+  issueDate: string;
+  hoursCount: number;
+  validationUrl: string;
+}
+
+export interface DocumentFile {
+  id: string;
+  title: string;
+  type: 'pdf' | 'doc' | 'diario_republica' | 'edital' | 'guia';
+  sizeFormatted: string;
+  category: string;
+  downloadUrl?: string;
+  lastUpdated: string;
+}
+
+export interface ConcursoEntry {
+  id: string;
+  ministryName: string;
+  title: string;
+  positionsCount: number;
+  educationLevel: 'Ensino Médio' | 'Licenciatura' | 'Mestrado' | 'Todos';
+  status: 'Aberto' | 'Previsto' | 'Em Fase de Exames' | 'Encerrado';
+  noticeUrl?: string;
+  updatedAt: string;
+}
+
+export interface CentralRepositoryData {
+  legislacao: ConceptArticle[];
+  documentos: DocumentFile[];
+  materiais: DiplomaModule[];
+  perguntasRespostas: { id: string; question: string; answer: string; module: string }[];
+  simulados: SmartQuizQuestion[];
+  cursos: Course[];
+  certificados: Certificate[];
+  concursos: ConcursoEntry[];
+}
+

@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { ALL_MODULES } from '../data';
-import { ConceptArticle, DiplomaModule, ModuleId } from '../types/minint';
-import { Search, Command, X, Check, ArrowRight } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { ModuleId } from '../types/minint';
+import { Search, Command, X, Check, ArrowRight, Database } from 'lucide-react';
+import { searchIndexedDB, IndexedSearchResult, initSearchDatabase } from '../lib/indexedDbSearch';
 
 interface QuickFindModalProps {
   isOpen: boolean;
@@ -121,18 +121,18 @@ const truncateAroundMatch = (text: string, query: string, maxLength = 130): stri
 };
 
 /**
- * Select the best snippet string from an article for a given query
+ * Select the best snippet string from an indexed result item for a given query
  */
-const getBestSnippet = (art: ConceptArticle, query: string): string => {
+const getBestSnippetFromItem = (res: IndexedSearchResult, query: string): string => {
   const normQuery = normalizeText(query.trim());
-  if (!normQuery) return art.simpleExplanation || art.definition || art.legalText || '';
+  if (!normQuery) return res.simpleExplanation || res.definition || res.legalText || '';
 
   const candidates = [
-    art.simpleExplanation,
-    art.definition,
-    art.legalText,
-    art.examAlert,
-    ...(art.importantPoints || [])
+    res.simpleExplanation,
+    res.definition,
+    res.legalText,
+    res.examAlert,
+    ...(res.importantPoints || [])
   ].filter(Boolean) as string[];
 
   for (const cand of candidates) {
@@ -150,16 +150,8 @@ const getBestSnippet = (art: ConceptArticle, query: string): string => {
     }
   }
 
-  return truncateAroundMatch(art.simpleExplanation || art.definition || art.legalText || '', query);
+  return truncateAroundMatch(res.simpleExplanation || res.definition || res.legalText || '', query);
 };
-
-interface SearchResultItem {
-  module: DiplomaModule;
-  chapterTitle: string;
-  sectionTitle?: string;
-  article: ConceptArticle;
-  score: number;
-}
 
 export const QuickFindModal: React.FC<QuickFindModalProps> = ({
   isOpen,
@@ -169,6 +161,7 @@ export const QuickFindModal: React.FC<QuickFindModalProps> = ({
   theme
 }) => {
   const [query, setQuery] = useState('');
+  const [results, setResults] = useState<IndexedSearchResult[]>([]);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const itemRefs = useRef<(HTMLButtonElement | null)[]>([]);
@@ -176,10 +169,12 @@ export const QuickFindModal: React.FC<QuickFindModalProps> = ({
   const isDark = theme === 'dark';
   const isSepia = theme === 'sepia';
 
-  // Focus input when modal opens
+  // Warm up or initialize IndexedDB on modal open
   useEffect(() => {
     if (isOpen) {
+      initSearchDatabase().catch(() => {});
       setQuery('');
+      setResults([]);
       setSelectedIndex(0);
       setTimeout(() => {
         inputRef.current?.focus();
@@ -187,125 +182,26 @@ export const QuickFindModal: React.FC<QuickFindModalProps> = ({
     }
   }, [isOpen]);
 
-  // Compute search results across all modules using prioritized ranking algorithm
-  const results: SearchResultItem[] = useMemo(() => {
-    const rawTrimmed = query.trim();
-    if (!rawTrimmed) return [];
+  // Execute IndexedDB search when query changes
+  useEffect(() => {
+    const trimmed = query.trim();
+    if (!trimmed) {
+      setResults([]);
+      setSelectedIndex(0);
+      return;
+    }
 
-    const normQuery = normalizeText(rawTrimmed);
-    const queryDigits = normQuery.replace(/[^0-9]/g, '');
-    const queryTokens = normQuery.split(/\s+/).filter(Boolean);
-
-    const scoredItems: SearchResultItem[] = [];
-
-    ALL_MODULES.forEach(mod => {
-      const normModShort = normalizeText(mod.shortTitle);
-      const normModTitle = normalizeText(mod.title);
-
-      mod.chapters.forEach(chap => {
-        const normChapTitle = normalizeText(chap.title);
-
-        const checkArticle = (art: ConceptArticle, secTitle?: string) => {
-          const normCode = normalizeText(art.code);
-          const normTitle = normalizeText(art.title);
-          const normDef = normalizeText(art.definition || '');
-          const normExpl = normalizeText(art.simpleExplanation || '');
-          const normLegal = normalizeText(art.legalText || '');
-          const normAlert = normalizeText(art.examAlert || '');
-          const normPoints = (art.importantPoints || []).map(p => normalizeText(p)).join(' ');
-
-          const codeDigits: string[] = normCode.match(/\d+/g) || [];
-
-          let score = 0;
-
-          // 1. ARTICLE CODE NUMERIC MATCHING
-          if (queryDigits && codeDigits.length > 0) {
-            if (codeDigits.includes(queryDigits)) {
-              if (codeDigits[0] === queryDigits) {
-                score += 3000;
-              } else {
-                score += 2400;
-              }
-            } else if (codeDigits.some(d => d.startsWith(queryDigits))) {
-              score += 1200;
-            }
-          }
-
-          // 2. CODE TEXT MATCHING
-          if (normCode === normQuery) {
-            score += 3500;
-          } else if (normCode.startsWith(normQuery)) {
-            score += 2000;
-          } else if (normCode.includes(normQuery)) {
-            score += 1400;
-          }
-
-          // 3. TITLE MATCHING
-          if (normTitle === normQuery) {
-            score += 1800;
-          } else if (normTitle.startsWith(normQuery)) {
-            score += 1100;
-          } else if (normTitle.includes(normQuery)) {
-            score += 800;
-          }
-
-          // 4. ACRONYM / MODULE / CHAPTER MATCHING
-          if (normModShort === normQuery || normModShort.startsWith(normQuery)) {
-            score += 700;
-          } else if (normModTitle.includes(normQuery) || normChapTitle.includes(normQuery)) {
-            score += 350;
-          }
-
-          // 5. SIMPLE EXPLANATION & DEFINITION
-          if (normExpl.includes(normQuery)) score += 350;
-          if (normDef.includes(normQuery)) score += 300;
-
-          // 6. LEGAL TEXT, EXAM ALERTS & IMPORTANT POINTS
-          if (normAlert.includes(normQuery)) score += 200;
-          if (normPoints.includes(normQuery)) score += 150;
-          if (normLegal.includes(normQuery)) score += 100;
-
-          // 7. MULTI-TOKEN FUZZY RELEVANCE
-          if (queryTokens.length > 1) {
-            const combinedText = `${normCode} ${normTitle} ${normModShort} ${normModTitle} ${normChapTitle} ${normExpl} ${normDef} ${normLegal} ${normAlert}`;
-            let matchedCount = 0;
-            queryTokens.forEach(tok => {
-              if (combinedText.includes(tok)) matchedCount++;
-            });
-
-            if (matchedCount === queryTokens.length) {
-              score += 500;
-            } else if (matchedCount > 0) {
-              score += matchedCount * 80;
-            } else {
-              score = 0;
-            }
-          }
-
-          if (score > 0) {
-            scoredItems.push({
-              module: mod,
-              chapterTitle: chap.title,
-              sectionTitle: secTitle,
-              article: art,
-              score
-            });
-          }
-        };
-
-        if (chap.articles) {
-          chap.articles.forEach(art => checkArticle(art));
-        }
-
-        if (chap.sections) {
-          chap.sections.forEach(sec => {
-            sec.articles.forEach(art => checkArticle(art, sec.title));
-          });
-        }
-      });
+    let isMounted = true;
+    searchIndexedDB(trimmed, 50).then(res => {
+      if (isMounted) {
+        setResults(res);
+        setSelectedIndex(0);
+      }
     });
 
-    return scoredItems.sort((a, b) => b.score - a.score);
+    return () => {
+      isMounted = false;
+    };
   }, [query]);
 
   // Ensure selected result item is smoothly scrolled into view inside search results list
@@ -335,7 +231,7 @@ export const QuickFindModal: React.FC<QuickFindModalProps> = ({
         e.preventDefault();
         if (results.length > 0 && results[selectedIndex]) {
           const item = results[selectedIndex];
-          onSelectResult(item.module.id, item.article.id);
+          onSelectResult(item.moduleId, item.articleId);
           onClose();
         }
       }
@@ -413,15 +309,15 @@ export const QuickFindModal: React.FC<QuickFindModalProps> = ({
           ) : (
             results.map((res, idx) => {
               const isSelected = idx === selectedIndex;
-              const isStudied = studiedArticleIds.includes(res.article.id);
-              const snippetText = getBestSnippet(res.article, query);
+              const isStudied = studiedArticleIds.includes(res.articleId);
+              const snippetText = getBestSnippetFromItem(res, query);
 
               return (
                 <button
-                  key={`${res.module.id}-${res.article.id}-${idx}`}
+                  key={`${res.id}-${idx}`}
                   ref={el => { itemRefs.current[idx] = el; }}
                   onClick={() => {
-                    onSelectResult(res.module.id, res.article.id);
+                    onSelectResult(res.moduleId, res.articleId);
                     onClose();
                   }}
                   onMouseEnter={() => setSelectedIndex(idx)}
@@ -439,17 +335,17 @@ export const QuickFindModal: React.FC<QuickFindModalProps> = ({
                 >
                   <div className="space-y-1 flex-1 min-w-0">
                     <div className="flex items-center gap-2 text-[10px] font-mono font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">
-                      <span>{res.module.shortTitle}</span>
+                      <span>{res.moduleShortTitle}</span>
                       <span>•</span>
                       <span className="truncate">{res.chapterTitle}</span>
                     </div>
 
                     <div className="flex items-center gap-2 font-semibold text-xs md:text-sm">
                       <span className="font-mono text-amber-500 dark:text-amber-400 flex-shrink-0">
-                        {highlightMatches(res.article.code, query)}
+                        {highlightMatches(res.code, query)}
                       </span>
                       <span className="truncate">
-                        {highlightMatches(res.article.title, query)}
+                        {highlightMatches(res.title, query)}
                       </span>
                     </div>
 
@@ -478,7 +374,10 @@ export const QuickFindModal: React.FC<QuickFindModalProps> = ({
 
         {/* Modal Footer */}
         <div className="p-3 border-t border-neutral-200 dark:border-neutral-800/80 bg-neutral-50 dark:bg-neutral-900/50 flex items-center justify-between text-[11px] font-mono text-neutral-500">
-          <span>{results.length} resultados encontrados</span>
+          <div className="flex items-center gap-2">
+            <Database className="w-3.5 h-3.5 text-amber-500" />
+            <span>IndexedDB Busca Offline: {results.length} resultados</span>
+          </div>
           <span className="hidden sm:inline">Pressione ESC para fechar</span>
         </div>
       </div>

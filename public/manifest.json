@@ -1,8 +1,8 @@
 {
-  "id": "preparatorio-oficial-minint",
-  "name": "Preparatório Oficial MININT",
-  "short_name": "MININT Prep",
-  "description": "Plataforma oficial de preparação e simulados para os exames e concursos do Ministério do Interior (MININT - Angola).",
+  "id": "academia-carreiras-publicas",
+  "name": "Academia das Carreiras Públicas",
+  "short_name": "Carreiras Públicas",
+  "description": "Plataforma permanente e gratuita de preparação e simulados para concursos públicos em Angola. Biblioteca digital única para o Ministério do Interior, Educação, Saúde, Administração Pública e Governos Locais.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

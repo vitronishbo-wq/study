@@ -16,6 +16,7 @@ import {
   CheckCircle2,
   TrendingUp,
   Award,
+  Building2,
   UserCheck,
   LogIn,
   LogOut,
@@ -32,6 +33,8 @@ interface SidebarProps {
   explorerOpen: boolean;
   onToggleExplorer: () => void;
   onOpenStatsModal?: () => void;
+  onOpenHomePortal?: () => void;
+  isHomeActive?: boolean;
 }
 
 const MODULE_ICONS: Record<string, React.ReactNode> = {
@@ -50,12 +53,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onToggleTheme,
   explorerOpen,
   onToggleExplorer,
-  onOpenStatsModal
+  onOpenStatsModal,
+  onOpenHomePortal,
+  isHomeActive = false
 }) => {
   const isDark = theme === 'dark';
   const isSepia = theme === 'sepia';
   const [showStats, setShowStats] = useState(false);
-  const [showProfile, setShowProfile] = useState(false);
   const { user, isAuthenticated, login, logout } = useVitronisAuth();
 
   // Compute stats per module and globally
@@ -96,8 +100,23 @@ export const Sidebar: React.FC<SidebarProps> = ({
           : 'bg-neutral-50 border-neutral-200 text-neutral-700'
       }`}
     >
-      {/* Top Branding / Tree Toggle */}
-      <div className="flex flex-col items-center gap-4">
+      {/* Top Branding / Tree Toggle / Home Portal */}
+      <div className="flex flex-col items-center gap-3">
+        {onOpenHomePortal && (
+          <button
+            id="btn-open-home-portal"
+            onClick={onOpenHomePortal}
+            title="Academia das Carreiras Públicas — Página Inicial"
+            className={`p-2.5 rounded-xl transition-all cursor-pointer ${
+              isHomeActive
+                ? 'bg-amber-600 text-white font-bold ring-2 ring-amber-400/50 shadow-md'
+                : 'hover:bg-neutral-200/60 dark:hover:bg-neutral-800 text-amber-600 dark:text-amber-400'
+            }`}
+          >
+            <Building2 className="w-5 h-5" />
+          </button>
+        )}
+
         <button
           id="btn-toggle-explorer"
           onClick={onToggleExplorer}

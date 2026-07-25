@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { WifiOff, Wifi, CloudOff, BookOpen, BarChart2, Search, Clock, X, CheckCircle2, Zap, FileText, HelpCircle, Brain, HardDrive, ShieldCheck, Database } from 'lucide-react';
+import { WifiOff, Wifi, CloudOff, BookOpen, BarChart2, Search, Clock, X, CheckCircle2, Zap, FileText, HelpCircle, Brain, HardDrive, ShieldCheck, Database, RefreshCw } from 'lucide-react';
 import { Chapter, ConceptArticle } from '../types/minint';
+import { getSearchDatabaseInfo, forceReindexDatabase, IndexStatusInfo } from '../lib/indexedDbSearch';
 
 interface StatusBarProps {
   currentChapterTitle: string;
@@ -13,6 +14,7 @@ interface StatusBarProps {
   onOpenQuickFind?: () => void;
   onOpenStatsModal?: () => void;
   onToggleExplorer?: () => void;
+  onOpenSettingsModal?: () => void;
 }
 
 export const StatusBar: React.FC<StatusBarProps> = ({
@@ -25,11 +27,14 @@ export const StatusBar: React.FC<StatusBarProps> = ({
   theme,
   onOpenQuickFind,
   onOpenStatsModal,
-  onToggleExplorer
+  onToggleExplorer,
+  onOpenSettingsModal
 }) => {
   const [timelineOpen, setTimelineOpen] = useState(false);
   const [offlineCacheOpen, setOfflineCacheOpen] = useState(false);
   const [isOnline, setIsOnline] = useState(() => (typeof navigator !== 'undefined' ? navigator.onLine : true));
+  const [dbSyncInfo, setDbSyncInfo] = useState<IndexStatusInfo | null>(null);
+  const [isSyncing, setIsSyncing] = useState(false);
 
   useEffect(() => {
     const handleOnline = () => setIsOnline(true);
@@ -38,11 +43,24 @@ export const StatusBar: React.FC<StatusBarProps> = ({
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
 
+    // Fetch initial IndexedDB sync status
+    getSearchDatabaseInfo().then(info => setDbSyncInfo(info));
+
     return () => {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
     };
   }, []);
+
+  const handleReindex = async () => {
+    setIsSyncing(true);
+    try {
+      const updated = await forceReindexDatabase();
+      setDbSyncInfo(updated);
+    } finally {
+      setIsSyncing(false);
+    }
+  };
 
   const isDark = theme === 'dark';
   const isSepia = theme === 'sepia';
@@ -336,7 +354,7 @@ export const StatusBar: React.FC<StatusBarProps> = ({
         </div>
       </button>
 
-      {/* 5. Ícone de Acesso Offline com Status do Cache */}
+      {/* 5. Ícone e Indicador Persistente de Acesso Offline & Sincronização IndexedDB */}
       <div className="relative flex items-center">
         <button
           id="btn-statusbar-offline-status"
@@ -346,24 +364,31 @@ export const StatusBar: React.FC<StatusBarProps> = ({
               ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs ring-2 ring-emerald-500/30'
               : 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/30 hover:bg-emerald-500/20'
           }`}
-          title="Verificar Status do Cache e Acesso Offline"
+          title="Verificar Sincronização IndexedDB e Acesso Offline"
         >
           <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+            <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${isSyncing ? 'bg-amber-400' : 'bg-emerald-400'} opacity-75`}></span>
+            <span className={`relative inline-flex rounded-full h-2 w-2 ${isSyncing ? 'bg-amber-500' : 'bg-emerald-500'}`}></span>
           </span>
+
+          <Database className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+
           {isOnline ? (
-            <WifiOff className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+            <Wifi className="w-3 h-3 text-blue-500 hidden sm:inline-block" />
           ) : (
-            <CloudOff className="w-3.5 h-3.5 text-amber-500" />
+            <WifiOff className="w-3 h-3 text-amber-500" />
           )}
-          <span className="font-bold">Acesso Offline</span>
-          <span className="hidden sm:inline px-1 py-0.2 rounded text-[9px] bg-emerald-500/20 text-emerald-800 dark:text-emerald-300">
-            100% Cache
+
+          <span className="font-bold">
+            {isSyncing ? 'A Indexar DB...' : 'IndexedDB Sincronizada'}
+          </span>
+
+          <span className="hidden sm:inline px-1 py-0.2 rounded text-[9px] bg-emerald-500/20 text-emerald-800 dark:text-emerald-300 font-mono">
+            {dbSyncInfo ? `${dbSyncInfo.indexedCount}/${dbSyncInfo.totalCount}` : '100% Ok'}
           </span>
         </button>
 
-        {/* Popover Informativo de Status do Cache Offline */}
+        {/* Popover Informativo de Status do Cache Offline & IndexedDB */}
         {offlineCacheOpen && (
           <>
             <div
@@ -383,14 +408,14 @@ export const StatusBar: React.FC<StatusBarProps> = ({
               <div className="flex items-center justify-between pb-2.5 border-b border-neutral-200 dark:border-neutral-800">
                 <div className="flex items-center gap-2">
                   <div className="p-1.5 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
-                    <HardDrive className="w-4 h-4" />
+                    <Database className="w-4 h-4" />
                   </div>
                   <div>
                     <h4 className="text-xs font-bold uppercase tracking-wider flex items-center gap-1.5">
-                      Status do Cache Offline
+                      Sincronização IndexedDB
                     </h4>
                     <p className="text-[11px] text-neutral-500 dark:text-neutral-400 font-normal">
-                      Armazenamento Local do Dispositivo
+                      Base de Dados de Pesquisa Offline
                     </p>
                   </div>
                 </div>
@@ -402,7 +427,7 @@ export const StatusBar: React.FC<StatusBarProps> = ({
                 </button>
               </div>
 
-              {/* Status de Rede & Prontidão do Cache */}
+              {/* Status de Rede, Cache & Indexação */}
               <div className="grid grid-cols-2 gap-2 text-xs">
                 <div className={`p-2.5 rounded-xl border flex flex-col justify-between ${
                   isDark ? 'bg-neutral-950 border-neutral-800' : isSepia ? 'bg-[#fcf7ee] border-[#e2d5b8]' : 'bg-neutral-50 border-neutral-200'
@@ -426,47 +451,65 @@ export const StatusBar: React.FC<StatusBarProps> = ({
                 <div className={`p-2.5 rounded-xl border flex flex-col justify-between ${
                   isDark ? 'bg-neutral-950 border-neutral-800' : isSepia ? 'bg-[#fcf7ee] border-[#e2d5b8]' : 'bg-neutral-50 border-neutral-200'
                 }`}>
-                  <span className="text-[10px] text-neutral-500 uppercase tracking-wide">Estado do Cache</span>
+                  <span className="text-[10px] text-neutral-500 uppercase tracking-wide">Estado do Índice</span>
                   <div className="flex items-center gap-1.5 font-extrabold text-emerald-600 dark:text-emerald-400 mt-1">
                     <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
-                    <span>100% Carregado</span>
+                    <span>{dbSyncInfo?.isIndexed ? 'Totalmente Indexado' : 'A Indexar...'}</span>
                   </div>
                 </div>
               </div>
 
-              {/* Lista de Módulos Pré-Carregados */}
-              <div className="space-y-1.5 pt-1">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-400 flex items-center justify-between">
-                  <span>Módulos Guardados no Cache</span>
-                  <span className="text-emerald-600 dark:text-emerald-400 text-[10px]">PWA / Ready</span>
-                </span>
-
-                <div className="space-y-1 text-xs">
-                  {[
-                    { title: 'Estatuto Orgânico do MININT', badge: '100% Ok' },
-                    { title: 'Estatuto da Polícia Nacional', badge: '100% Ok' },
-                    { title: 'Constituição da República (CRA)', badge: '100% Ok' },
-                    { title: 'Cultura Geral e 21 Províncias (DPA)', badge: '100% Ok' },
-                    { title: 'História de Angola & Libertação', badge: '100% Ok' }
-                  ].map((item, idx) => (
-                    <div key={idx} className="flex items-center justify-between p-2 rounded-lg bg-neutral-50 dark:bg-neutral-950/60 border border-neutral-200/60 dark:border-neutral-800/60">
-                      <div className="flex items-center gap-2">
-                        <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
-                        <span className="font-medium text-neutral-800 dark:text-neutral-200 text-[11px] truncate max-w-[210px]">{item.title}</span>
-                      </div>
-                      <span className="font-mono text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded">
-                        {item.badge}
-                      </span>
-                    </div>
-                  ))}
+              {/* Detalhes Técnicos da Indexação */}
+              <div className="p-2.5 rounded-xl bg-neutral-100 dark:bg-neutral-950/70 border border-neutral-200/80 dark:border-neutral-800/80 space-y-1.5 text-xs">
+                <div className="flex items-center justify-between text-neutral-600 dark:text-neutral-300">
+                  <span>Artigos Indexados:</span>
+                  <span className="font-mono font-bold text-amber-500">
+                    {dbSyncInfo ? `${dbSyncInfo.indexedCount} de ${dbSyncInfo.totalCount}` : 'A carregar...'}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between text-neutral-600 dark:text-neutral-300 text-[11px]">
+                  <span>Motor de Pesquisa:</span>
+                  <span className="font-mono text-emerald-500 font-semibold uppercase">
+                    {dbSyncInfo?.dbType === 'indexeddb' ? 'IndexedDB Nativas' : 'Memória Cache'}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between text-neutral-600 dark:text-neutral-300 text-[11px]">
+                  <span>Última Sincronização:</span>
+                  <span className="font-mono text-neutral-400">
+                    {dbSyncInfo?.lastUpdated || 'Agora'}
+                  </span>
                 </div>
               </div>
 
+              {/* Botão de Reindexação Manual */}
+              <button
+                onClick={handleReindex}
+                disabled={isSyncing}
+                className="w-full py-2 px-3 rounded-xl bg-amber-500 hover:bg-amber-600 active:bg-amber-700 text-neutral-950 font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-50"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
+                <span>{isSyncing ? 'A Sincronizar e Indexar...' : 'Atualizar Índice Offline'}</span>
+              </button>
+
+              {/* Botão para abrir Painel Completo de Definições */}
+              {onOpenSettingsModal && (
+                <button
+                  onClick={() => {
+                    setOfflineCacheOpen(false);
+                    onOpenSettingsModal();
+                  }}
+                  className="w-full py-2 px-3 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-amber-400 font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer border border-neutral-700"
+                >
+                  <Database className="w-3.5 h-3.5 text-amber-400" />
+                  <span>Painel Completo de Sincronização</span>
+                </button>
+              )}
+
               {/* Nota Informativa */}
               <div className="flex items-center gap-2 p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-800 dark:text-emerald-300 text-[11px]">
-                <Database className="w-4 h-4 flex-shrink-0 text-emerald-500" />
+                <HardDrive className="w-4 h-4 flex-shrink-0 text-emerald-500" />
                 <span>
-                  Pode utilizar a plataforma no telemóvel ou computador mesmo sem dados móveis ou acesso à internet. O progresso e as pesquisas funcionam totalmente offline.
+                  O índice do IndexedDB armazena todos os diplomas e matérias localmente no browser para permitir pesquisas instantâneas e difusas sem ligação à internet.
                 </span>
               </div>
             </div>

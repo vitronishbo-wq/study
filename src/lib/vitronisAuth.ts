@@ -15,8 +15,10 @@ export interface VitronisUser {
   provider?: string;
 }
 
+export const JOBEXPRESS_URL = import.meta.env.VITE_JOBEXPRESS_URL || import.meta.env.JOBEXPRESS_URL || 'https://jobexpress-angola.onrender.com';
+
 export const VITRONIS_CONFIG = {
-  appName: import.meta.env.VITE_APP_NAME || 'Preparatório Oficial MININT',
+  appName: import.meta.env.VITE_APP_NAME || 'Academia das Carreiras Públicas',
   appEnv: import.meta.env.VITE_APP_ENV || 'production',
   defaultLanguage: import.meta.env.VITE_DEFAULT_LANGUAGE || 'pt-AO',
   country: import.meta.env.VITE_COUNTRY || 'AO',
@@ -27,10 +29,10 @@ export const VITRONIS_CONFIG = {
   web: import.meta.env.VITE_VITRONIS_WEB || 'https://www.vitronis.co.ao',
   api: import.meta.env.VITE_VITRONIS_API || 'https://api.vitronis.co.ao',
   ssoDomain: import.meta.env.VITE_VITRONIS_SSO_DOMAIN || 'https://accounts.vitronis.co.ao',
-  jobExpressUrl: import.meta.env.VITE_JOBEXPRESS_URL || 'https://jobexpress.vitronis.co.ao',
+  jobExpressUrl: import.meta.env.VITE_JOBEXPRESS_URL || 'https://jobexpress-angola.onrender.com',
   jwtIssuer: import.meta.env.VITE_VITRONIS_JWT_ISSUER || 'accounts.vitronis.co.ao',
   jwtAudience: import.meta.env.VITE_VITRONIS_JWT_AUDIENCE || 'vitronis-platform',
-  returnAfterLogin: import.meta.env.VITE_RETURN_AFTER_LOGIN || 'https://preparacao-oficial-minint-ckkm.onrender.com',
+  returnAfterLogin: import.meta.env.VITE_RETURN_AFTER_LOGIN || 'https://academia-carreiras-publicas.vitronis.co.ao',
 };
 
 const TOKEN_STORAGE_KEY = 'vitronis_jwt_token';
@@ -46,10 +48,10 @@ export function decodeVitronisJWT(token: string): VitronisUser | null {
       const payload = JSON.parse(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/')));
       return {
         id: payload.sub || payload.id || 'jobexpress-user',
-        name: payload.name || payload.full_name || payload.username || 'Candidato MININT',
+        name: payload.name || payload.full_name || payload.username || 'Candidato ao Estado',
         email: payload.email || 'candidato@vitronis.co.ao',
         avatar: payload.avatar || payload.picture,
-        role: payload.role || 'Candidato Concurso',
+        role: payload.role || 'Candidato a Carreira Pública',
         provider: 'JobExpress Angola'
       };
     }
@@ -60,7 +62,7 @@ export function decodeVitronisJWT(token: string): VitronisUser | null {
   // Fallback if token is opaque string
   return {
     id: 'je-user-session',
-    name: 'Candidato MININT',
+    name: 'Candidato ao Estado',
     email: 'candidato@vitronis.co.ao',
     role: 'Candidato Verificado (JobExpress)',
     provider: 'JobExpress Angola'
@@ -131,7 +133,7 @@ export function redirectToVitronisSSO(targetReturnPath?: string) {
 
   // Endpoint de autenticação externalizado para JobExpress Angola
   const baseSsoUrl = VITRONIS_CONFIG.jobExpressUrl || VITRONIS_CONFIG.ssoDomain;
-  const loginEndpoint = `${baseSsoUrl.replace(/\/$/, '')}/login?return_to=${fullReturnUrl}&client_id=preparatorio-minint`;
+  const loginEndpoint = `${baseSsoUrl.replace(/\/$/, '')}/login?return_to=${fullReturnUrl}&client_id=academia-carreiras-publicas`;
 
   window.location.href = loginEndpoint;
 }

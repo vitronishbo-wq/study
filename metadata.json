@@ -1,6 +1,6 @@
 {
-  "name": "Plataforma de Estudo MININT",
-  "description": "Plataforma oficial de preparação para concursos públicos do Ministério do Interior de Angola (MININT). Livro digital inteligente e offline.",
+  "name": "Academia das Carreiras Públicas",
+  "description": "Plataforma permanente de preparação gratuita para concursos públicos em Angola. Biblioteca digital para o Ministério do Interior, Educação, Saúde, Administração Pública e Poder Local.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }
