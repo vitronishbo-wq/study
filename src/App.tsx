@@ -15,7 +15,8 @@ import { initSearchDatabase } from './lib/indexedDbSearch';
 
 export default function App() {
   const [viewMode, setViewMode] = useState<'portal' | 'reader'>('portal');
-  const [activeModuleId, setActiveModuleId] = useState<ModuleId>('constituição');
+  const [activeTab, setActiveTab] = useState<string>('biblioteca');
+  const [activeModuleId, setActiveModuleId] = useState<ModuleId>('educacao');
   const [activeArticleId, setActiveArticleId] = useState<string | null>(null);
   // Default explorerOpen to false on smartphones (< 768px) for clean text reading
   const [explorerOpen, setExplorerOpen] = useState(() => typeof window !== 'undefined' ? window.innerWidth >= 768 : false);
@@ -47,6 +48,16 @@ export default function App() {
 
   // All articles in the active module
   const allArticles = useMemo(() => getAllArticlesInModule(currentModule), [currentModule]);
+
+  // Total articles across all modules
+  const totalArticlesAcrossModules = useMemo(() => {
+    return ALL_MODULES.reduce((acc, m) => acc + getAllArticlesInModule(m).length, 0);
+  }, []);
+
+  const totalStudiedCount = progress.studiedArticleIds.length;
+  const overallPercentage = totalArticlesAcrossModules > 0
+    ? Math.round((totalStudiedCount / totalArticlesAcrossModules) * 100)
+    : 0;
 
   // Default to first article when changing module if active article isn't in module
   useEffect(() => {
@@ -88,6 +99,13 @@ export default function App() {
     if (progress.theme === 'light') setTheme('sepia');
     else if (progress.theme === 'sepia') setTheme('dark');
     else setTheme('light');
+  };
+
+  const handleSelectTab = (tabId: string) => {
+    setActiveTab(tabId);
+    if (tabId === 'biblioteca' || tabId === 'concursos' || tabId === 'simulados' || tabId === 'perfil' || tabId === 'definicoes') {
+      setViewMode('portal');
+    }
   };
 
   // Keyboard shortcuts (Arrow navigation & Ctrl+K / Cmd+K Quick Find)
@@ -139,14 +157,10 @@ export default function App() {
     const deltaX = touch.clientX - edgeTouchStart.x;
     const deltaY = Math.abs(touch.clientY - edgeTouchStart.y);
 
-    // Only handle horizontal swipes if vertical scroll displacement is small (< 80px)
     if (deltaY < 80) {
-      // 1. Swipe Right from Left Edge (startX < 60px) -> Open Drawer
       if (edgeTouchStart.x < 60 && deltaX > 50 && !explorerOpen) {
         setExplorerOpen(true);
-      }
-      // 2. Swipe Left when Drawer is Open -> Close Drawer
-      else if (deltaX < -60 && explorerOpen) {
+      } else if (deltaX < -60 && explorerOpen) {
         setExplorerOpen(false);
       }
     }
@@ -173,7 +187,7 @@ export default function App() {
           />
         )}
 
-        {/* MOBILE EDGE PULL HANDLE (Puxador Lateral Oculto para sinalizar o menu) */}
+        {/* MOBILE EDGE PULL HANDLE */}
         {!explorerOpen && (
           <button
             onClick={() => setExplorerOpen(true)}
@@ -184,38 +198,35 @@ export default function App() {
           </button>
         )}
 
-        {/* MOBILE FLOATING ACTION BUTTON (FAB - Acesso Rápido ao Explorador) */}
+        {/* MOBILE FLOATING ACTION BUTTON */}
         {!explorerOpen && (
           <button
             onClick={() => setExplorerOpen(true)}
             className="md:hidden fixed right-4 bottom-14 z-30 bg-amber-500 text-neutral-950 p-3.5 rounded-full shadow-2xl border-2 border-amber-300 flex items-center justify-center gap-2 font-bold active:scale-95 transition-all cursor-pointer hover:bg-amber-400"
-            title="Abrir Explorador de Módulos"
+            title="Abrir Índice do Documento"
           >
             <Layers className="w-5 h-5 text-neutral-950" />
-            <span className="text-xs uppercase tracking-wider font-extrabold hidden sm:inline">Módulos</span>
+            <span className="text-xs uppercase tracking-wider font-extrabold hidden sm:inline">Índice</span>
           </button>
         )}
 
-        {/* DESKTOP SIDEBAR (Visible on md+ screens) */}
+        {/* DESKTOP SIDEBAR */}
         <div className="hidden md:flex flex-shrink-0 h-full">
           <Sidebar
-            activeModuleId={activeModuleId}
-            onSelectModule={(mId) => {
-              setActiveModuleId(mId);
-              setViewMode('reader');
-            }}
-            studiedArticleIds={progress.studiedArticleIds}
+            activeTab={activeTab}
+            onSelectTab={handleSelectTab}
             theme={progress.theme}
             onToggleTheme={handleToggleTheme}
             explorerOpen={explorerOpen}
             onToggleExplorer={() => setExplorerOpen(!explorerOpen)}
+            overallPercentage={overallPercentage}
+            totalArticlesCount={totalArticlesAcrossModules}
+            totalStudiedCount={totalStudiedCount}
             onOpenStatsModal={() => setStatsModalOpen(true)}
-            onOpenHomePortal={() => setViewMode('portal')}
-            isHomeActive={viewMode === 'portal'}
           />
         </div>
 
-        {/* DESKTOP EXPLORER (Collapsible panel on md+ screens when in reader view) */}
+        {/* DESKTOP EXPLORER */}
         {explorerOpen && viewMode === 'reader' && (
           <div className="hidden md:flex flex-shrink-0 h-full">
             <Explorer
@@ -236,7 +247,7 @@ export default function App() {
           </div>
         )}
 
-        {/* MOBILE COMBINED SLIDE-OVER DRAWER (Smartphone Sidebar + Explorer overlay) */}
+        {/* MOBILE COMBINED SLIDE-OVER DRAWER */}
         <div
           id="mobile-drawer-container"
           className={`fixed inset-y-0 left-0 z-50 flex h-full max-w-[90vw] sm:max-w-md shadow-2xl transition-transform duration-150 ease-out md:hidden ${
@@ -244,42 +255,40 @@ export default function App() {
           }`}
         >
           <Sidebar
-            activeModuleId={activeModuleId}
-            onSelectModule={(mId) => {
-              setActiveModuleId(mId);
-              setViewMode('reader');
+            activeTab={activeTab}
+            onSelectTab={(tabId) => {
+              handleSelectTab(tabId);
               setExplorerOpen(false);
             }}
-            studiedArticleIds={progress.studiedArticleIds}
             theme={progress.theme}
             onToggleTheme={handleToggleTheme}
             explorerOpen={explorerOpen}
             onToggleExplorer={() => setExplorerOpen(!explorerOpen)}
+            overallPercentage={overallPercentage}
+            totalArticlesCount={totalArticlesAcrossModules}
+            totalStudiedCount={totalStudiedCount}
             onOpenStatsModal={() => setStatsModalOpen(true)}
-            onOpenHomePortal={() => {
-              setViewMode('portal');
-              setExplorerOpen(false);
-            }}
-            isHomeActive={viewMode === 'portal'}
           />
 
-          <Explorer
-            moduleData={currentModule}
-            activeArticleId={activeArticle?.id || null}
-            onSelectArticle={(artId) => {
-              setActiveArticleId(artId);
-              setViewMode('reader');
-              setExplorerOpen(false); // Auto-close drawer on smartphone selection
-            }}
-            onSelectModule={(mId) => {
-              setActiveModuleId(mId);
-              setViewMode('reader');
-              setExplorerOpen(false);
-            }}
-            studiedArticleIds={progress.studiedArticleIds}
-            theme={progress.theme}
-            onCloseExplorer={() => setExplorerOpen(false)}
-          />
+          {viewMode === 'reader' && (
+            <Explorer
+              moduleData={currentModule}
+              activeArticleId={activeArticle?.id || null}
+              onSelectArticle={(artId) => {
+                setActiveArticleId(artId);
+                setViewMode('reader');
+                setExplorerOpen(false);
+              }}
+              onSelectModule={(mId) => {
+                setActiveModuleId(mId);
+                setViewMode('reader');
+                setExplorerOpen(false);
+              }}
+              studiedArticleIds={progress.studiedArticleIds}
+              theme={progress.theme}
+              onCloseExplorer={() => setExplorerOpen(false)}
+            />
+          )}
         </div>
 
         {/* 3. MAIN AREA: PORTAL HOME OR DIGITAL READER */}
@@ -297,18 +306,33 @@ export default function App() {
           />
         ) : activeArticle ? (
           <div className="flex-1 flex flex-col overflow-hidden">
-            {/* Top Bar for Returning to Portal Home */}
+            {/* Top Bar Navigation & Breadcrumb */}
             <div className="px-4 py-2 border-b bg-neutral-900/90 border-neutral-800 text-neutral-200 text-xs flex items-center justify-between z-10 shadow-xs">
               <button
                 onClick={() => setViewMode('portal')}
                 className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-300 font-bold hover:bg-amber-500/30 transition-all cursor-pointer"
               >
                 <ArrowLeft className="w-3.5 h-3.5" />
-                <span>Página Inicial (Academia)</span>
+                <span>Voltar à Biblioteca</span>
               </button>
-              <div className="flex items-center gap-2 font-mono text-[11px] text-amber-400">
-                <Building2 className="w-3.5 h-3.5" />
-                <span className="font-bold hidden sm:inline">Academia das Carreiras Públicas</span>
+
+              {/* Mandatory Breadcrumb */}
+              <div className="flex items-center gap-1.5 font-mono text-[11px] text-neutral-300 truncate max-w-md">
+                <span className="text-amber-400 font-bold">Biblioteca</span>
+                <span className="text-neutral-600">›</span>
+                <span className="truncate text-amber-200">{currentModule.shortTitle}</span>
+                {articleDetail?.chapterTitle && (
+                  <>
+                    <span className="text-neutral-600">›</span>
+                    <span className="truncate text-neutral-400 hidden sm:inline">{articleDetail.chapterTitle.split('—')[0]}</span>
+                  </>
+                )}
+                {activeArticle && (
+                  <>
+                    <span className="text-neutral-600">›</span>
+                    <span className="font-bold text-amber-400">{activeArticle.code}</span>
+                  </>
+                )}
               </div>
             </div>
 
@@ -351,7 +375,7 @@ export default function App() {
         )}
       </div>
 
-      {/* 4. BARRA INFERIOR (Discrete status & progress bar with Immersive Scroll Transition) */}
+      {/* BARRA INFERIOR STATUS BAR */}
       <div className={`transition-all duration-300 ease-in-out ${
         isBarsVisible
           ? 'translate-y-0 opacity-100 max-h-16'
@@ -374,7 +398,7 @@ export default function App() {
         />
       </div>
 
-      {/* 5. QUICK-FIND MODAL (Ctrl+K) */}
+      {/* QUICK-FIND MODAL */}
       <QuickFindModal
         isOpen={quickFindOpen}
         onClose={() => setQuickFindOpen(false)}
@@ -383,7 +407,7 @@ export default function App() {
         theme={progress.theme}
       />
 
-      {/* 6. PAINEL DE ESTATÍSTICAS DE ESTUDO */}
+      {/* PAINEL DE ESTATÍSTICAS DE ESTUDO */}
       <StudyStatsModal
         isOpen={statsModalOpen}
         onClose={() => setStatsModalOpen(false)}
@@ -392,7 +416,7 @@ export default function App() {
         onSelectModule={(mId) => setActiveModuleId(mId as ModuleId)}
       />
 
-      {/* 7. PAINEL DE DEFINIÇÕES & SINCRONIZAÇÃO */}
+      {/* PAINEL DE DEFINIÇÕES */}
       <SettingsModal
         isOpen={settingsModalOpen}
         onClose={() => setSettingsModalOpen(false)}

@@ -8,6 +8,7 @@ import { searchIndexedDB, IndexedSearchResult } from '../lib/indexedDbSearch';
 import { SyncManagementView } from './SyncManagementView';
 import { JOBEXPRESS_URL } from '../lib/vitronisAuth';
 import { useVitronisAuth } from '../hooks/useVitronisAuth';
+import { JobExpressLink } from './JobExpressLink';
 
 import { CentralRepository } from '../data/CentralRepository';
 import {
@@ -946,20 +947,15 @@ export const HomePortal: React.FC<HomePortalProps> = ({
         </div>
 
         <div className="flex flex-col sm:flex-row items-center gap-3 flex-shrink-0 w-full md:w-auto">
-          <a
-            href={JOBEXPRESS_URL}
-            onClick={(e) => {
-              e.preventDefault();
-              handleNavigateJobExpress('home_portal_banner');
-            }}
-            target="_blank"
-            rel="noopener noreferrer"
+          <JobExpressLink
+            source="home_portal_banner"
+            campaign="portal_banner_cta"
             className="w-full sm:w-auto px-6 py-3 rounded-2xl bg-amber-500 hover:bg-amber-400 active:bg-amber-600 text-neutral-950 font-bold text-xs md:text-sm shadow-xl transition-all cursor-pointer flex items-center justify-center gap-2"
           >
             <Briefcase className="w-4 h-4 text-neutral-950" />
             <span>Conhecer Gratuitamente</span>
             <ExternalLink className="w-3.5 h-3.5 text-neutral-950 ml-0.5" />
-          </a>
+          </JobExpressLink>
 
           <button
             onClick={() => setShowJobExpressModal(true)}
@@ -970,7 +966,26 @@ export const HomePortal: React.FC<HomePortalProps> = ({
         </div>
       </section>
 
-      {/* 8. MODAL INFORMATIVO JOBEXPRESS */}
+      {/* 8. FOOTER INSTITUCIONAL */}
+      <footer className="mt-8 pt-6 pb-4 border-t border-neutral-200 dark:border-neutral-800 text-xs text-neutral-500 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="flex items-center gap-2">
+          <span className="font-bold text-neutral-700 dark:text-neutral-300">
+            Academia das Carreiras Públicas & Legislação
+          </span>
+          <span className="text-neutral-400">•</span>
+          <span>República de Angola</span>
+        </div>
+
+        <div className="flex items-center gap-6">
+          <JobExpressLink
+            source="footer"
+            utmSource="preparatorio"
+            campaign="footer_partner_link"
+          />
+        </div>
+      </footer>
+
+      {/* 9. MODAL INFORMATIVO JOBEXPRESS */}
       {showJobExpressModal && (
         <div className="fixed inset-0 z-50 bg-neutral-950/80 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn">
           <div className="bg-neutral-900 border border-amber-500/40 rounded-3xl p-6 md:p-8 max-w-lg w-full space-y-5 text-neutral-100 shadow-2xl relative">
@@ -1020,19 +1035,14 @@ export const HomePortal: React.FC<HomePortalProps> = ({
               >
                 Voltar aos Estudos
               </button>
-              <a
-                href={JOBEXPRESS_URL}
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleNavigateJobExpress('home_portal_modal');
-                }}
-                target="_blank"
-                rel="noreferrer"
+              <JobExpressLink
+                source="home_portal_modal"
+                campaign="portal_modal_cta"
                 className="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-neutral-950 font-bold text-xs flex items-center gap-1.5 shadow-md"
               >
                 <span>Visitar JobExpress</span>
                 <ExternalLink className="w-3.5 h-3.5" />
-              </a>
+              </JobExpressLink>
             </div>
           </div>
         </div>

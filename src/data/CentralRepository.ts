@@ -39,12 +39,12 @@ export const CENTRAL_DOCUMENTS: DocumentFile[] = [
     lastUpdated: '2026-01-15'
   },
   {
-    id: 'doc-estatuto-pna',
-    title: 'Decreto Presidencial n.º 152/19 — Regulamento de Carreiras da PNA',
+    id: 'doc-estatuto-med-222-20',
+    title: 'Decreto Presidencial n.º 222/20 — Estatuto Orgânico do Ministério da Educação (MED)',
     type: 'diario_republica',
-    sizeFormatted: '1.8 MB',
-    category: 'Segurança Pública',
-    lastUpdated: '2026-02-10'
+    sizeFormatted: '1.9 MB',
+    category: 'Legislação Educativa',
+    lastUpdated: '2026-07-25'
   },
   {
     id: 'doc-dpa-21-prov',

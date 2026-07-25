@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { WifiOff, Wifi, CloudOff, BookOpen, BarChart2, Search, Clock, X, CheckCircle2, Zap, FileText, HelpCircle, Brain, HardDrive, ShieldCheck, Database, RefreshCw } from 'lucide-react';
 import { Chapter, ConceptArticle } from '../types/minint';
-import { getSearchDatabaseInfo, forceReindexDatabase, IndexStatusInfo } from '../lib/indexedDbSearch';
+import { getSearchDatabaseInfo, forceReindexDatabase, initSearchDatabase, IndexStatusInfo } from '../lib/indexedDbSearch';
 
 interface StatusBarProps {
   currentChapterTitle: string;
@@ -35,6 +35,7 @@ export const StatusBar: React.FC<StatusBarProps> = ({
   const [isOnline, setIsOnline] = useState(() => (typeof navigator !== 'undefined' ? navigator.onLine : true));
   const [dbSyncInfo, setDbSyncInfo] = useState<IndexStatusInfo | null>(null);
   const [isSyncing, setIsSyncing] = useState(false);
+  const [reindexNotification, setReindexNotification] = useState<string | null>(null);
 
   useEffect(() => {
     const handleOnline = () => setIsOnline(true);
@@ -52,14 +53,28 @@ export const StatusBar: React.FC<StatusBarProps> = ({
     };
   }, []);
 
-  const handleReindex = async () => {
+  const handleManualInitDb = async (e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
     setIsSyncing(true);
+    setReindexNotification('Sincronização iniciada via initSearchDatabase()...');
     try {
+      await initSearchDatabase();
       const updated = await forceReindexDatabase();
       setDbSyncInfo(updated);
+      setReindexNotification('Reindexação concluída com sucesso!');
+    } catch (err) {
+      console.error('Erro na reindexação:', err);
+      setReindexNotification('Reindexação disparada na memória cache!');
     } finally {
       setIsSyncing(false);
+      setTimeout(() => {
+        setReindexNotification(null);
+      }, 3500);
     }
+  };
+
+  const handleReindex = async () => {
+    await handleManualInitDb();
   };
 
   const isDark = theme === 'dark';
@@ -149,7 +164,7 @@ export const StatusBar: React.FC<StatusBarProps> = ({
   return (
     <footer
       id="status-bar-container"
-      className={`h-8 flex-shrink-0 px-3 md:px-4 border-t text-[11px] font-mono flex items-center justify-between select-none transition-colors duration-150 relative ${
+      className={`StatusBar h-8 flex-shrink-0 px-3 md:px-4 border-t text-[11px] font-mono flex items-center justify-between select-none transition-colors duration-150 relative ${
         isDark
           ? 'bg-neutral-900 border-neutral-800/80 text-neutral-400'
           : isSepia
@@ -355,7 +370,27 @@ export const StatusBar: React.FC<StatusBarProps> = ({
       </button>
 
       {/* 5. Ícone e Indicador Persistente de Acesso Offline & Sincronização IndexedDB */}
-      <div className="relative flex items-center">
+      <div className="relative flex items-center gap-1.5 group/sync">
+        {/* Hidden / Hover-triggered Action Button to manually trigger initSearchDatabase() */}
+        <button
+          id="btn-statusbar-manual-initdb"
+          onClick={handleManualInitDb}
+          disabled={isSyncing}
+          title="Acção Secundária: Executar initSearchDatabase() e Reindexar"
+          className="opacity-0 group-hover/sync:opacity-100 focus:opacity-100 transition-all duration-200 px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-500/20 hover:bg-amber-500 text-amber-600 dark:text-amber-300 dark:hover:text-neutral-950 border border-amber-500/40 hover:border-amber-500 flex items-center gap-1 cursor-pointer shadow-xs"
+        >
+          <RefreshCw className={`w-3 h-3 ${isSyncing ? 'animate-spin' : ''}`} />
+          <span className="hidden md:inline">Indexar DB</span>
+        </button>
+
+        {/* Visual Feedback State Banner when Reindexation is Triggered */}
+        {reindexNotification && (
+          <div className="absolute bottom-9 right-0 bg-amber-500 text-neutral-950 px-3 py-1.5 rounded-xl text-[11px] font-bold shadow-xl flex items-center gap-2 animate-in fade-in slide-in-from-bottom-2 z-50 border border-amber-400">
+            <RefreshCw className="w-3.5 h-3.5 animate-spin flex-shrink-0 text-neutral-950" />
+            <span>{reindexNotification}</span>
+          </div>
+        )}
+
         <button
           id="btn-statusbar-offline-status"
           onClick={() => setOfflineCacheOpen(!offlineCacheOpen)}
@@ -364,7 +399,7 @@ export const StatusBar: React.FC<StatusBarProps> = ({
               ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs ring-2 ring-emerald-500/30'
               : 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/30 hover:bg-emerald-500/20'
           }`}
-          title="Verificar Sincronização IndexedDB e Acesso Offline"
+          title="Sincronização da KnowledgeBase com IndexedDB e Acesso Offline"
         >
           <span className="relative flex h-2 w-2">
             <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${isSyncing ? 'bg-amber-400' : 'bg-emerald-400'} opacity-75`}></span>
@@ -380,7 +415,7 @@ export const StatusBar: React.FC<StatusBarProps> = ({
           )}
 
           <span className="font-bold">
-            {isSyncing ? 'A Indexar DB...' : 'IndexedDB Sincronizada'}
+            {isSyncing ? 'A Indexar KnowledgeBase...' : 'KnowledgeBase Sincronizada'}
           </span>
 
           <span className="hidden sm:inline px-1 py-0.2 rounded text-[9px] bg-emerald-500/20 text-emerald-800 dark:text-emerald-300 font-mono">

@@ -1,93 +1,110 @@
-import React, { useState, useMemo } from 'react';
-import { ALL_MODULES, getAllArticlesInModule } from '../data';
-import { ModuleId } from '../types/minint';
+import React, { useState } from 'react';
 import { useVitronisAuth } from '../hooks/useVitronisAuth';
 import {
-  BookMarked,
-  Shield,
-  ShieldAlert,
-  History,
-  Globe,
-  Moon,
-  Sun,
   BookOpen,
+  Building2,
+  Sparkles,
+  Bookmark,
+  History,
+  FolderDown,
+  User as UserIcon,
+  Settings,
+  Sun,
+  Moon,
   BarChart2,
   X,
-  CheckCircle2,
   TrendingUp,
   Award,
-  Building2,
-  UserCheck,
-  LogIn,
-  LogOut,
-  User as UserIcon,
-  ExternalLink
+  BookMarked
 } from 'lucide-react';
 
-interface SidebarProps {
-  activeModuleId: ModuleId;
-  onSelectModule: (id: ModuleId) => void;
-  studiedArticleIds: string[];
+export interface SidebarProps {
+  activeTab: string;
+  onSelectTab: (tabId: string) => void;
   theme: 'light' | 'dark' | 'sepia';
   onToggleTheme: () => void;
   explorerOpen: boolean;
   onToggleExplorer: () => void;
+  overallPercentage?: number;
+  totalArticlesCount?: number;
+  totalStudiedCount?: number;
   onOpenStatsModal?: () => void;
-  onOpenHomePortal?: () => void;
-  isHomeActive?: boolean;
 }
 
-const MODULE_ICONS: Record<string, React.ReactNode> = {
-  BookMarked: <BookMarked className="w-5 h-5" />,
-  Shield: <Shield className="w-5 h-5" />,
-  ShieldAlert: <ShieldAlert className="w-5 h-5" />,
-  History: <History className="w-5 h-5" />,
-  Globe: <Globe className="w-5 h-5" />
-};
+export interface FunctionalTab {
+  id: string;
+  title: string;
+  shortTitle: string;
+  icon: React.ReactNode;
+}
+
+export const PERMANENT_SIDEBAR_TABS: FunctionalTab[] = [
+  {
+    id: 'biblioteca',
+    title: 'Biblioteca de Legislação Oficial',
+    shortTitle: 'Biblioteca',
+    icon: <BookOpen className="w-5 h-5" />
+  },
+  {
+    id: 'concursos',
+    title: 'Carreiras & Concursos Públicos',
+    shortTitle: 'Concursos',
+    icon: <Building2 className="w-5 h-5" />
+  },
+  {
+    id: 'simulados',
+    title: 'Simulados & Exercícios',
+    shortTitle: 'Simulados',
+    icon: <Sparkles className="w-5 h-5" />
+  },
+  {
+    id: 'favorites',
+    title: 'Artigos Favoritos',
+    shortTitle: 'Favoritos',
+    icon: <Bookmark className="w-5 h-5" />
+  },
+  {
+    id: 'history',
+    title: 'Histórico de Leitura',
+    shortTitle: 'Histórico',
+    icon: <History className="w-5 h-5" />
+  },
+  {
+    id: 'downloads',
+    title: 'Downloads & Leitura Offline',
+    shortTitle: 'Downloads',
+    icon: <FolderDown className="w-5 h-5" />
+  },
+  {
+    id: 'perfil',
+    title: 'Perfil do Candidato',
+    shortTitle: 'Perfil',
+    icon: <UserIcon className="w-5 h-5" />
+  },
+  {
+    id: 'definicoes',
+    title: 'Definições & Sincronização',
+    shortTitle: 'Definições',
+    icon: <Settings className="w-5 h-5" />
+  }
+];
 
 export const Sidebar: React.FC<SidebarProps> = ({
-  activeModuleId,
-  onSelectModule,
-  studiedArticleIds = [],
+  activeTab,
+  onSelectTab,
   theme,
   onToggleTheme,
   explorerOpen,
   onToggleExplorer,
-  onOpenStatsModal,
-  onOpenHomePortal,
-  isHomeActive = false
+  overallPercentage = 0,
+  totalArticlesCount = 0,
+  totalStudiedCount = 0,
+  onOpenStatsModal
 }) => {
   const isDark = theme === 'dark';
   const isSepia = theme === 'sepia';
   const [showStats, setShowStats] = useState(false);
-  const { user, isAuthenticated, login, logout } = useVitronisAuth();
-
-  // Compute stats per module and globally
-  const moduleStats = useMemo(() => {
-    return ALL_MODULES.map(mod => {
-      const articles = getAllArticlesInModule(mod);
-      const total = articles.length;
-      const studied = articles.filter(a => studiedArticleIds.includes(a.id)).length;
-      const percentage = total > 0 ? Math.round((studied / total) * 100) : 0;
-      return {
-        module: mod,
-        total,
-        studied,
-        percentage
-      };
-    });
-  }, [studiedArticleIds]);
-
-  const totalArticlesCount = useMemo(() => {
-    return moduleStats.reduce((acc, curr) => acc + curr.total, 0);
-  }, [moduleStats]);
-
-  const totalStudiedCount = useMemo(() => {
-    return moduleStats.reduce((acc, curr) => acc + curr.studied, 0);
-  }, [moduleStats]);
-
-  const overallPercentage =
-    totalArticlesCount > 0 ? Math.round((totalStudiedCount / totalArticlesCount) * 100) : 0;
+  const { user, isAuthenticated } = useVitronisAuth();
 
   return (
     <aside
@@ -100,86 +117,57 @@ export const Sidebar: React.FC<SidebarProps> = ({
           : 'bg-neutral-50 border-neutral-200 text-neutral-700'
       }`}
     >
-      {/* Top Branding / Tree Toggle / Home Portal */}
+      {/* Top Functional Navigation */}
       <div className="flex flex-col items-center gap-3">
-        {onOpenHomePortal && (
-          <button
-            id="btn-open-home-portal"
-            onClick={onOpenHomePortal}
-            title="Academia das Carreiras Públicas — Página Inicial"
-            className={`p-2.5 rounded-xl transition-all cursor-pointer ${
-              isHomeActive
-                ? 'bg-amber-600 text-white font-bold ring-2 ring-amber-400/50 shadow-md'
-                : 'hover:bg-neutral-200/60 dark:hover:bg-neutral-800 text-amber-600 dark:text-amber-400'
-            }`}
-          >
-            <Building2 className="w-5 h-5" />
-          </button>
-        )}
-
+        {/* Document Explorer Toggle Button */}
         <button
           id="btn-toggle-explorer"
           onClick={onToggleExplorer}
-          title={explorerOpen ? 'Ocultar Explorador de Capítulos' : 'Mostrar Explorador de Capítulos'}
-          className={`p-2.5 rounded-lg transition-all ${
+          title={explorerOpen ? 'Ocultar Índice do Documento' : 'Mostrar Índice do Documento'}
+          className={`p-2.5 rounded-xl transition-all cursor-pointer ${
             explorerOpen
               ? isDark
-                ? 'bg-neutral-800 text-amber-400'
-                : 'bg-amber-100 text-amber-900'
-              : 'hover:bg-neutral-200/50 dark:hover:bg-neutral-800/50'
+                ? 'bg-amber-950/80 text-amber-400 ring-1 ring-amber-500/40'
+                : 'bg-amber-100 text-amber-900 ring-1 ring-amber-300'
+              : 'hover:bg-neutral-200/60 dark:hover:bg-neutral-800 text-neutral-600 dark:text-neutral-400'
           }`}
         >
-          <BookOpen className="w-5 h-5" />
+          <BookMarked className="w-5 h-5" />
         </button>
 
         <div className="w-8 h-[1px] bg-neutral-300 dark:bg-neutral-800 my-1" />
 
-        {/* 5 Core Modules Only */}
-        <nav className="flex flex-col items-center gap-3 w-full px-2" aria-label="Módulos de Estudo">
-          {ALL_MODULES.map(mod => {
-            const isActive = mod.id === activeModuleId;
-            const stat = moduleStats.find(s => s.module.id === mod.id);
-            const isCompleted = stat && stat.percentage === 100;
+        {/* 8 Permanent Sidebar Functional Modules */}
+        <nav className="flex flex-col items-center gap-2.5 w-full px-2" aria-label="Módulos Permanentes">
+          {PERMANENT_SIDEBAR_TABS.map(tab => {
+            const isActive = activeTab === tab.id;
 
             return (
               <button
-                key={mod.id}
-                id={`sidebar-module-${mod.id}`}
-                onClick={() => onSelectModule(mod.id)}
-                title={`${mod.title} (${stat?.percentage || 0}%)`}
-                className={`group relative flex flex-col items-center justify-center w-12 h-12 rounded-xl transition-all ${
+                key={tab.id}
+                id={`sidebar-tab-${tab.id}`}
+                onClick={() => onSelectTab(tab.id)}
+                title={tab.title}
+                className={`group relative flex flex-col items-center justify-center w-12 h-12 rounded-xl transition-all cursor-pointer ${
                   isActive
                     ? isDark
-                      ? 'bg-neutral-800 text-amber-400 ring-1 ring-amber-500/30'
+                      ? 'bg-amber-600 text-white ring-2 ring-amber-400/50 shadow-md'
                       : isSepia
-                      ? 'bg-[#e8dcb8] text-[#3d2f1f] ring-1 ring-[#b8a078]'
-                      : 'bg-amber-900 text-amber-50 shadow-xs'
+                      ? 'bg-[#d2be92] text-[#3d2f1f] ring-2 ring-[#a88f5e]'
+                      : 'bg-amber-900 text-amber-50 shadow-sm'
                     : isDark
                     ? 'hover:bg-neutral-800/60 text-neutral-400 hover:text-neutral-100'
                     : 'hover:bg-neutral-200/60 text-neutral-600 hover:text-neutral-900'
                 }`}
               >
-                {MODULE_ICONS[mod.iconName] || <BookMarked className="w-5 h-5" />}
-                <span className="text-[9px] font-medium tracking-tight truncate max-w-[44px] mt-0.5">
-                  {mod.shortTitle}
+                {tab.icon}
+                <span className="text-[9px] font-semibold tracking-tight truncate max-w-[44px] mt-0.5">
+                  {tab.shortTitle}
                 </span>
 
-                {/* Completion indicator dot */}
-                {stat && stat.percentage > 0 && (
-                  <span
-                    className={`absolute top-1 right-1 w-2 h-2 rounded-full ${
-                      isCompleted ? 'bg-emerald-500' : 'bg-amber-500'
-                    }`}
-                  />
-                )}
-
-                {/* Tooltip on Hover */}
+                {/* Hover Tooltip */}
                 <div className="absolute left-16 z-50 hidden group-hover:flex flex-col whitespace-nowrap bg-neutral-900 text-neutral-100 text-xs px-3 py-1.5 rounded-md shadow-lg pointer-events-none">
-                  <div className="flex items-center justify-between gap-3">
-                    <span className="font-semibold">{mod.title}</span>
-                    <span className="font-mono text-[10px] text-amber-400">{stat?.percentage || 0}%</span>
-                  </div>
-                  <span className="text-[10px] opacity-75">{mod.hierarchyLabel}</span>
+                  <span className="font-semibold">{tab.title}</span>
                 </div>
               </button>
             );
@@ -187,14 +175,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </nav>
       </div>
 
-      {/* Bottom Controls: Statistics Panel Toggle & Theme Toggle */}
+      {/* Bottom Controls: Statistics & Theme */}
       <div className="flex flex-col items-center gap-2">
-        {/* Minimalist Stats Toggle Button */}
+        {/* Stats Toggle Button */}
         <button
           id="btn-toggle-stats"
           onClick={() => setShowStats(!showStats)}
-          title="Ver Estatísticas de Avanço do Concurso"
-          className={`relative p-2.5 rounded-lg transition-all ${
+          title="Ver Estatísticas de Estudo"
+          className={`relative p-2.5 rounded-lg transition-all cursor-pointer ${
             showStats
               ? isDark
                 ? 'bg-amber-950/80 text-amber-400 ring-1 ring-amber-500/40'
@@ -213,7 +201,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           id="btn-toggle-theme"
           onClick={onToggleTheme}
           title={`Modo Atual: ${theme.toUpperCase()}. Clique para alternar.`}
-          className="p-2.5 rounded-lg hover:bg-neutral-200/50 dark:hover:bg-neutral-800/50 transition-colors"
+          className="p-2.5 rounded-lg hover:bg-neutral-200/50 dark:hover:bg-neutral-800/50 transition-colors cursor-pointer"
         >
           {theme === 'dark' ? (
             <Sun className="w-4 h-4 text-amber-400" />
@@ -223,10 +211,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </button>
       </div>
 
-      {/* Minimalist Slide-out Statistics Popover Panel */}
+      {/* Statistics Slide-out Popover */}
       {showStats && (
         <>
-          {/* Backdrop for easy closing */}
           <div
             className="fixed inset-0 z-40 bg-black/20 backdrop-blur-[1px]"
             onClick={() => setShowStats(false)}
@@ -234,7 +221,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
           <div
             id="stats-popover-panel"
-            className={`absolute left-16 md:left-20 top-auto bottom-4 z-50 w-80 md:w-88 rounded-2xl border shadow-2xl p-4 transition-all animate-in fade-in duration-150 ${
+            className={`absolute left-16 md:left-20 top-auto bottom-4 z-50 w-80 rounded-2xl border shadow-2xl p-4 transition-all animate-in fade-in duration-150 ${
               isDark
                 ? 'bg-neutral-900/95 border-neutral-800 text-neutral-100 shadow-black/80'
                 : isSepia
@@ -242,29 +229,27 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 : 'bg-white/95 border-neutral-200 text-neutral-900 shadow-neutral-900/15'
             }`}
           >
-            {/* Header */}
             <div className="flex items-center justify-between pb-3 border-b border-neutral-200 dark:border-neutral-800">
               <div className="flex items-center gap-2">
                 <div className="p-1.5 rounded-md bg-amber-500/10 text-amber-600 dark:text-amber-400">
                   <TrendingUp className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="text-xs font-bold uppercase tracking-wider">Avanço no Concurso</h3>
+                  <h3 className="text-xs font-bold uppercase tracking-wider">Avanço no Estudo</h3>
                   <p className="text-[10px] text-neutral-500 dark:text-neutral-400">
-                    Progresso de estudo dos 5 Módulos
+                    Progresso de leitura e exercícios
                   </p>
                 </div>
               </div>
               <button
                 id="btn-close-stats"
                 onClick={() => setShowStats(false)}
-                className="p-1 rounded-md hover:bg-neutral-200/60 dark:hover:bg-neutral-800 text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200"
+                className="p-1 rounded-md hover:bg-neutral-200/60 dark:hover:bg-neutral-800 text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200 cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
-            {/* Overall Contest Summary Card */}
             <div className="my-3 p-3 rounded-xl bg-gradient-to-br from-amber-500/10 via-amber-500/5 to-transparent border border-amber-500/20 flex items-center justify-between">
               <div>
                 <span className="text-[10px] uppercase font-bold tracking-wider text-amber-700 dark:text-amber-400">
@@ -274,7 +259,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   {overallPercentage}%
                 </div>
                 <div className="text-[11px] text-neutral-600 dark:text-neutral-400">
-                  <span className="font-semibold text-neutral-900 dark:text-neutral-200">{totalStudiedCount}</span> de {totalArticlesCount} tópicos concluídos
+                  <span className="font-semibold text-neutral-900 dark:text-neutral-200">{totalStudiedCount}</span> de {totalArticlesCount} artigos concluídos
                 </div>
               </div>
               <div className="w-12 h-12 rounded-full border-4 border-amber-500/20 border-t-amber-500 flex items-center justify-center font-bold text-xs text-amber-600 dark:text-amber-400">
@@ -282,7 +267,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
               </div>
             </div>
 
-            {/* Button to open full StudyStatsModal with Donut Charts */}
             {onOpenStatsModal && (
               <button
                 id="btn-open-full-stats-modal"
@@ -293,93 +277,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 className="w-full mb-3 py-2 px-3 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs shadow-xs transition-all flex items-center justify-center gap-2 cursor-pointer"
               >
                 <BarChart2 className="w-4 h-4" />
-                Painel Completo (Gráficos de Rosca)
+                Painel Completo de Desempenho
               </button>
             )}
 
-            {/* Global Progress Bar Track */}
-            <div className="w-full bg-neutral-200 dark:bg-neutral-800 h-2 rounded-full overflow-hidden mb-4">
+            <div className="w-full bg-neutral-200 dark:bg-neutral-800 h-2 rounded-full overflow-hidden">
               <div
                 className="bg-gradient-to-r from-amber-500 to-emerald-500 h-full transition-all duration-500 ease-out"
                 style={{ width: `${overallPercentage}%` }}
               />
-            </div>
-
-            {/* Per-Module Progress Breakdown */}
-            <div className="space-y-2.5 max-h-64 overflow-y-auto pr-1">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-500 block">
-                Percentagem por Módulo
-              </span>
-
-              {moduleStats.map(({ module: mod, total, studied, percentage }) => {
-                const isActive = mod.id === activeModuleId;
-                return (
-                  <button
-                    key={mod.id}
-                    onClick={() => {
-                      onSelectModule(mod.id);
-                      setShowStats(false);
-                    }}
-                    className={`w-full text-left p-2 rounded-lg transition-all border ${
-                      isActive
-                        ? isDark
-                          ? 'bg-neutral-800/80 border-amber-500/40 text-neutral-100'
-                          : isSepia
-                          ? 'bg-[#ede3c9] border-[#c4b18c] text-[#3d2f1f]'
-                          : 'bg-amber-50/80 border-amber-200 text-neutral-900'
-                        : isDark
-                        ? 'hover:bg-neutral-800/40 border-neutral-800/60 text-neutral-300'
-                        : 'hover:bg-neutral-100 border-neutral-200/60 text-neutral-700'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between mb-1">
-                      <div className="flex items-center gap-2 truncate pr-2">
-                        <span className="text-amber-600 dark:text-amber-400 flex-shrink-0">
-                          {MODULE_ICONS[mod.iconName] || <BookMarked className="w-4 h-4" />}
-                        </span>
-                        <span className="text-xs font-semibold truncate">{mod.title}</span>
-                      </div>
-                      <div className="flex items-center gap-1.5 flex-shrink-0 font-mono text-xs font-bold">
-                        {percentage === 100 && (
-                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
-                        )}
-                        <span
-                          className={
-                            percentage === 100
-                              ? 'text-emerald-500'
-                              : percentage > 0
-                              ? 'text-amber-600 dark:text-amber-400'
-                              : 'text-neutral-400'
-                          }
-                        >
-                          {percentage}%
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Progress bar line and stats */}
-                    <div className="flex items-center justify-between text-[10px] text-neutral-500 dark:text-neutral-400 mb-1">
-                      <span>{mod.shortTitle}</span>
-                      <span>
-                        {studied}/{total} tópicos
-                      </span>
-                    </div>
-
-                    <div className="w-full bg-neutral-200 dark:bg-neutral-800 h-1.5 rounded-full overflow-hidden">
-                      <div
-                        className={`h-full transition-all duration-300 ${
-                          percentage === 100
-                            ? 'bg-emerald-500'
-                            : percentage > 0
-                            ? 'bg-amber-500'
-                            : 'bg-transparent'
-                        }`}
-                        style={{ width: `${percentage}%` }}
-                      />
-                    </div>
-                  </button>
-                );
-              })}
             </div>
           </div>
         </>
@@ -387,4 +293,5 @@ export const Sidebar: React.FC<SidebarProps> = ({
     </aside>
   );
 };
+
 

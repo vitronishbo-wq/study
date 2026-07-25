@@ -4,6 +4,7 @@ export type ModuleId =
   | 'policia'
   | 'historia'
   | 'cultura_geral'
+  | 'educacao'
   | 'portugues'
   | 'matematica'
   | 'informatica'

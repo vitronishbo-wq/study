@@ -4,13 +4,15 @@ import { minintModule } from './modules/minint';
 import { policiaModule } from './modules/policia';
 import { historiaModule } from './modules/historia';
 import { culturaGeralModule } from './modules/cultura_geral';
+import { educacaoModule } from './modules/educacao';
 
 export const ALL_MODULES: DiplomaModule[] = [
   constituicaoModule,
   minintModule,
   policiaModule,
   historiaModule,
-  culturaGeralModule
+  culturaGeralModule,
+  educacaoModule
 ];
 
 export function getModuleById(id: ModuleId): DiplomaModule {

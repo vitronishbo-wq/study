@@ -27,19 +27,20 @@ export const ALL_CONCURSOS: MinistryConcurso[] = [
     ministryName: 'Ministério da Educação',
     shortName: 'MED / Educação',
     iconName: 'GraduationCap',
-    badge: 'Preparação Permanente',
-    description: 'Concursos Públicos de Admissão de Professores de Ensino Primário, Secundário, Técnicos e Agentes de Educação no Estado.',
+    badge: 'Decreto Presidencial n.º 222/20',
+    description: 'Concursos Públicos de Admissão de Professores de Ensino Primário, Secundário, Técnicos e Agentes de Educação do Estado.',
     targetCareers: [
       'Professor do Ensino Primário e Secundário',
       'Especialista em Administração Escolar',
-      'Técnico de Legislação Educativa'
+      'Técnico de Legislação Educativa e Inspecção Escolar'
     ],
-    moduleIds: ['constituição', 'cultura_geral', 'historia'],
+    moduleIds: ['educacao', 'constituição', 'cultura_geral', 'historia'],
     keyTopics: [
+      'Estatuto Orgânico do MED (Decreto Presidencial n.º 222/20)',
       'Direito Constitucional à Educação (Art. 79.º CRA)',
+      'Supervisão Pedagógica & Inspecção Escolar',
       'Nova Divisão Político-Administrativa (21 Províncias - Lei 14/24)',
-      'História e Geografia de Angola',
-      'Ética e Deontologia no Serviço Público'
+      'Ética e Deontologia no Serviço Público Docente'
     ]
   },
   {
