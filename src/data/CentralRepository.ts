@@ -63,12 +63,169 @@ export const CENTRAL_DOCUMENTS: DocumentFile[] = [
     lastUpdated: '2026-01-20'
   },
   {
+    id: 'doc-estatuto-pna',
+    title: 'Decreto Presidencial n.º 152/19 — Regulamento Geral da Polícia Nacional de Angola',
+    type: 'diario_republica',
+    sizeFormatted: '2.1 MB',
+    category: 'Carreiras Policiais & MININT',
+    lastUpdated: '2026-02-10'
+  },
+  {
+    id: 'doc-cpa-angola',
+    title: 'Decreto-Lei n.º 16/A/95 — Código do Procedimento Administrativo Angolano',
+    type: 'diario_republica',
+    sizeFormatted: '1.8 MB',
+    category: 'Direito Administrativo',
+    lastUpdated: '2026-04-12'
+  },
+  {
+    id: 'doc-estatuto-minsa',
+    title: 'Decreto Presidencial n.º 260/21 — Estatuto do Serviço Nacional de Saúde (MINSA)',
+    type: 'pdf',
+    sizeFormatted: '2.3 MB',
+    category: 'Saúde Pública',
+    lastUpdated: '2026-05-01'
+  },
+  {
+    id: 'doc-cgt-agt',
+    title: 'Lei n.º 21/14 — Código Geral Tributário e Regulamento da AGT',
+    type: 'pdf',
+    sizeFormatted: '3.5 MB',
+    category: 'Fiscalidade & Finanças',
+    lastUpdated: '2026-01-05'
+  },
+  {
     id: 'doc-edital-minint-2026',
     title: 'Edital de Abertura do Concurso Público MININT & PNA 2026',
     type: 'edital',
     sizeFormatted: '1.2 MB',
     category: 'Concursos Públicos',
     lastUpdated: '2026-05-12'
+  },
+  {
+    id: 'doc-edital-med-2026',
+    title: 'Edital do Concurso Público de Professores MED 2026',
+    type: 'edital',
+    sizeFormatted: '1.5 MB',
+    category: 'Concursos Públicos',
+    lastUpdated: '2026-06-20'
+  }
+];
+
+// 2.1 Glossário Jurídico Oficial (Termos para Exames de Concurso)
+export interface GlossaryTerm {
+  id: string;
+  term: string;
+  category: 'Direito Constitucional' | 'Direito Administrativo' | 'Direito Penal' | 'Cultura Geral';
+  definition: string;
+  example: string;
+}
+
+export const CENTRAL_GLOSSARY: GlossaryTerm[] = [
+  {
+    id: 'gl-01',
+    term: 'Habeas Corpus',
+    category: 'Direito Constitucional',
+    definition: 'Garantia constitucional contra a prisão ou detenção ilegal ou arbitrária de qualquer cidadão.',
+    example: 'Impetrado junto do Tribunal Supremo quando a prisão preventiva ultrapassa os prazos legais.'
+  },
+  {
+    id: 'gl-02',
+    term: 'Acto Administrativo',
+    category: 'Direito Administrativo',
+    definition: 'Decisão de um órgão da Administração Pública que produz efeitos jurídicos numa situação individual e concreta.',
+    example: 'O despacho de nomeação de um funcionário aprovado em concurso público é um acto administrativo.'
+  },
+  {
+    id: 'gl-03',
+    term: 'Vício de Forma',
+    category: 'Direito Administrativo',
+    definition: 'Ilegalidade do acto administrativo resultante da omissão de formalidades essenciais exigidas por lei.',
+    example: 'Falta de fundamentação escrita ou omissão de audiência prévia do interessado.'
+  },
+  {
+    id: 'gl-04',
+    term: 'Poder Discricionário',
+    category: 'Direito Administrativo',
+    definition: 'Margem de livre escolha concedida pela lei à Administração Pública para decidir segundo a oportunidade e conveniência.',
+    example: 'Escolha da data de realização das provas entre os limites fixados no edital.'
+  },
+  {
+    id: 'gl-05',
+    term: 'Recurso Hierárquico',
+    category: 'Direito Administrativo',
+    definition: 'Pedido dirigido ao superior hierárquico do autor do acto para alterar ou anular uma decisão desfavorável.',
+    example: 'Recurso apresentado ao Ministro do Interior contra decisão do Comandante Geral da PNA.'
+  },
+  {
+    id: 'gl-06',
+    term: 'Promulgação',
+    category: 'Direito Constitucional',
+    definition: 'Acto pelo qual o Presidente da República atesta a existência da lei e determina a sua publicação no Diário da República.',
+    example: 'A promulgação do decreto presidencial pelo Chefe de Estado.'
+  },
+  {
+    id: 'gl-07',
+    term: 'Presunção de Inocência',
+    category: 'Direito Penal',
+    definition: 'Princípio segundo o qual todo o cidadão se presume inocente até ao trânsito em julgado da sentença condenatória.',
+    example: 'Garantia consagrada no Artigo 67.º da Constituição da República de Angola.'
+  },
+  {
+    id: 'gl-08',
+    term: 'Autarquia Local',
+    category: 'Direito Administrativo',
+    definition: 'Pessoa colectiva territorial dotada de órgãos eleitos, autonomia administrativa e financeira para gerir os interesses locais.',
+    example: 'Consagrada no Artigo 213.º da CRA para descentralização do poder do Estado.'
+  },
+  {
+    id: 'gl-09',
+    term: 'Desconcentração',
+    category: 'Direito Administrativo',
+    definition: 'Distribuição de competências entre diferentes órgãos da mesma pessoa colectiva (Estado).',
+    example: 'Delegação de poderes do Governador Provincial ao Administrador Municipal.'
+  },
+  {
+    id: 'gl-10',
+    term: 'Nulidade do Acto',
+    category: 'Direito Administrativo',
+    definition: 'Forma mais grave de invalidez do acto administrativo que não produz quaisquer efeitos jurídicos desde a sua origem.',
+    example: 'Acto praticado com usurpação de poder ou manifesta violação da Constituição.'
+  }
+];
+
+// 2.2 Perguntas Frequentes (FAQ de Preparação para Concursos Públicos)
+export interface CandidateFAQ {
+  id: string;
+  question: string;
+  answer: string;
+  category: string;
+}
+
+export const CENTRAL_FAQ: CandidateFAQ[] = [
+  {
+    id: 'faq-01',
+    question: 'Como funciona o cálculo da nota final nos exames de concurso em Angola?',
+    answer: 'Em regra, a prova escrita de conhecimentos vale 20 valores (mínimo de aprovação: 10 valores). Algumas carreiras adicionam prova prática, inspecção médica e avaliação documental.',
+    category: 'Exames & Provas'
+  },
+  {
+    id: 'faq-02',
+    question: 'Qual a importância de estudar a nova Divisão Político-Administrativa (Lei 14/24)?',
+    answer: 'A Lei n.º 14/24 instituiu 21 Províncias e 325 Municípios. É tema obrigatório e recorrente nas questões de Cultura Geral de todos os concursos públicos de 2026.',
+    category: 'Cultura Geral'
+  },
+  {
+    id: 'faq-03',
+    question: 'Posso utilizar a aplicação totalmente offline sem internet?',
+    answer: 'Sim! A plataforma sincroniza todos os diplomas legatários e simulados no IndexedDB do seu navegador, permitindo leitura e treino contínuo em qualquer lugar.',
+    category: 'Plataforma & Offline'
+  },
+  {
+    id: 'faq-04',
+    question: 'Onde encontro o edital oficial de abertura e inscrições?',
+    answer: 'Na aba Concursos e Downloads, dispomos dos editais oficiais em PDF e ligação directa ao portal JobExpress para candidaturas activas.',
+    category: 'Concursos'
   }
 ];
 

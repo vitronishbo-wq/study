@@ -10,6 +10,7 @@ export type ModuleId =
   | 'informatica'
   | 'etica'
   | 'administracao_publica'
+  | 'saude_financas'
   | 'legislacao'
   | 'raciocinio_logico';
 

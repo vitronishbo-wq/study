@@ -5,11 +5,15 @@ import { policiaModule } from './modules/policia';
 import { historiaModule } from './modules/historia';
 import { culturaGeralModule } from './modules/cultura_geral';
 import { educacaoModule } from './modules/educacao';
+import { administracaoPublicaModule } from './modules/administracao_publica';
+import { saudeFinancasModule } from './modules/saude_financas';
 
 export const ALL_MODULES: DiplomaModule[] = [
   constituicaoModule,
+  administracaoPublicaModule,
   minintModule,
   policiaModule,
+  saudeFinancasModule,
   historiaModule,
   culturaGeralModule,
   educacaoModule

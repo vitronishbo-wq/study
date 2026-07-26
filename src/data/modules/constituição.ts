@@ -2,12 +2,12 @@ import { DiplomaModule } from '../../types/minint';
 
 export const constituicaoModule: DiplomaModule = {
   id: 'constituição',
-  title: 'Constituição da República de Angola (CRA 2010)',
+  title: 'Constituição da República de Angola (CRA 2010 / Revisão 2021)',
   shortTitle: 'Constituição (CRA)',
   iconName: 'BookMarked',
   hierarchyLabel: 'Hierarquia I: Norma Suprema do Estado (Prioridade Máxima em Concursos)',
   hierarchyLevel: 1,
-  description: 'Texto constitucional vigente da República de Angola (aprovado a 21 de Janeiro de 2010 e promulgado a 5 de Fevereiro de 2010). Lei Suprema e Fundamental que rege o Estado, os direitos fundamentais, os órgãos de soberania e o sistema de segurança pública (PNA, SIC, SME, SP e SPCB).',
+  description: 'Texto constitucional vigente da República de Angola (Lei n.º 23/10, de 5 de Fevereiro, com as alterações introduzidas pela Lei de Revisão Constitucional n.º 18/21, de 16 de Setembro). Norma Fundamental que estrutura o Estado, consagra os Direitos Fundamentais, rege os Órgãos de Soberania, o Poder Judicial, a Administração Pública e o Sistema de Segurança Nacional (PNA, SIC, SME, SP, SPCB e FAA).',
   chapters: [
     {
       id: 'cra-cap-1',
@@ -30,6 +30,8 @@ export const constituicaoModule: DiplomaModule = {
                 'Objetivos: sociedade livre, justa, democrática, solidária, de paz e igualdade.'
               ],
               examAlert: 'Frequente em exames do MININT: Memorize os dois fundamentos principais no Artigo 1.º: Dignidade da pessoa humana + Vontade do povo angolano.',
+              keywords: ['república', 'soberania', 'dignidade humana', 'vontade do povo', 'fundamentos'],
+              relatedArticleIds: ['cra-art-2', 'cra-art-3', 'cra-art-6'],
               questions: [
                 {
                   id: 'q-cra-1',
@@ -69,6 +71,8 @@ export const constituicaoModule: DiplomaModule = {
                 'Dever de todos os poderes (Legislativo, Executivo e Judicial) de assegurar os Direitos Fundamentais.'
               ],
               examAlert: 'Ponto crítico: A CRA consagra a SEPARAÇÃO de poderes aliada à INTERDEPENDÊNCIA de funções (Art. 2.º, n.º 1).',
+              keywords: ['estado de direito', 'democracia', 'separação de poderes', 'interdependência', 'legalidade'],
+              relatedArticleIds: ['cra-art-1', 'cra-art-6', 'cra-art-105'],
               questions: [
                 {
                   id: 'q-cra-2',
@@ -108,6 +112,8 @@ export const constituicaoModule: DiplomaModule = {
                 'Compreende território terrestre, mar territorial, espaço aéreo, solo e subsolo.'
               ],
               examAlert: 'Cai sempre: A soberania pertence ao POVO e não a um determinado órgão ou grupo político.',
+              keywords: ['soberania', 'povo', 'sufrágio universal', 'eleições', 'território national'],
+              relatedArticleIds: ['cra-art-1', 'cra-art-4'],
               questions: [
                 {
                   id: 'q-cra-3',
@@ -133,6 +139,22 @@ export const constituicaoModule: DiplomaModule = {
               ]
             },
             {
+              id: 'cra-art-4',
+              code: 'Artigo 4.º',
+              title: 'Exercício do Poder Político',
+              legalText: `1. O poder político é exercido por quem obtenha legitimidade democrática através de eleições livres, iguais, directas, secretas e periódicas, nos termos da Constituição e da lei.
+2. É ilegítimo e punível nos termos da lei o apossamento ou o exercício do poder político com recurso à força ou a outros meios não previstos nem conformes com a Constituição.`,
+              definition: 'Princípio da legitimidade democrática e criminalização do golpe de Estado ou tomada ilegítima do poder.',
+              simpleExplanation: 'O poder só é legítimo quando conquistado através de eleições limpas. Qualquer tentativa de tomar o poder pela força ou por vias ilegais é crime grave.',
+              importantPoints: [
+                'Legitimidade democrática exige eleições livres e periódicas.',
+                'Tomada do poder pela força é expressamente ilegítima e punível por lei criminal.',
+                'Proteção da estabilidade constitucional e das instituições democráticas.'
+              ],
+              keywords: ['poder político', 'legitimidade', 'eleições', 'golpe de estado', 'crime'],
+              relatedArticleIds: ['cra-art-3', 'cra-art-202']
+            },
+            {
               id: 'cra-art-6',
               code: 'Artigo 6.º',
               title: 'Supremacia da Constituição e Legalidade',
@@ -147,6 +169,8 @@ export const constituicaoModule: DiplomaModule = {
                 'Invalidade automática de qualquer ato, tratado ou regulamento que contrarie a CRA.'
               ],
               examAlert: 'Super importante: Qualquer regulamento das forças de segurança que fira a Constituição é materialmente inconstitucional e nulo.',
+              keywords: ['supremacia', 'lei suprema', 'legalidade', 'inconstitucionalidade', 'hierarquia'],
+              relatedArticleIds: ['cra-art-2', 'cra-art-226'],
               questions: [
                 {
                   id: 'q-cra-6',
@@ -185,25 +209,62 @@ export const constituicaoModule: DiplomaModule = {
                 'Liberdade de organização e exercício de atividades religiosas.',
                 'Proteção dos locais de culto respeitadores da ordem pública.'
               ],
-              questions: [],
-              flashcards: []
+              keywords: ['estado laico', 'religião', 'igrejas', 'liberdade de culto', 'ordem pública'],
+              relatedArticleIds: ['cra-art-23', 'cra-art-236']
             },
             {
-              id: 'cra-art-18-19',
-              code: 'Artigos 18.º a 20.º',
-              title: 'Símbolos Nacionais, Língua Oficial e Capital',
-              legalText: `• Artigo 18.º (Símbolos Nacionais): São símbolos nacionais da República de Angola a Bandeira Nacional, a Insígnia Nacional e o Hino Nacional ("Angola Avante"), adoptados a 11 de Novembro de 1975.
-• Artigo 19.º (Línguas): A língua oficial da República de Angola é o português. O Estado valoriza e promove o estudo, o ensino e a utilização das demais línguas de Angola (línguas nacionais de origem africana).
-• Artigo 20.º (Capital): A capital da República de Angola é Luanda.`,
-              definition: 'Identidade nacional, soberania simbólica, regime linguístico e sede do poder central.',
-              simpleExplanation: 'Angola tem 3 símbolos sagrados (Bandeira, Insígnia e Hino "Angola Avante"). A língua oficial é o Português e a Capital é Luanda.',
+              id: 'cra-art-12',
+              code: 'Artigo 12.º',
+              title: 'Relações Internacionais e Direito Internacional',
+              legalText: `1. A República de Angola respeita e aplica os princípios da Carta da Organização das Nações Unidas e da Carta da União Africana.
+2. Os tratados e acordos internacionais validamente aprovados e ratificados vigoram na ordem jurídica angolana após a sua publicação oficial e entrada em vigor na ordem internacional.`,
+              definition: 'Recepção do Direito Internacional na ordem jurídica interna angolana.',
+              simpleExplanation: 'Tratados e Convenções Internacionais (como a Carta das Nações Unidas ou Convenções de Direitos Humanos) ratificados por Angola passam a valer como lei no país.',
               importantPoints: [
-                '3 Símbolos Nacionais: Bandeira, Insígnia e Hino Nacional ("Angola Avante").',
-                'Língua oficial: Português.',
-                'Dever de valorizar e ensinar as línguas angolanas de origem africana.',
-                'Capital da República: Luanda.'
+                'Respeito pelas Cartas da ONU e União Africana.',
+                'Vigor automático de tratados internacionais ratificados e publicados.',
+                'Subordinação à Constituição.'
               ],
-              examAlert: 'Frequente em Provas: A língua oficial é o Português, mas a Constituição impõe a promoção e valorização das línguas nacionais de origem africana.',
+              keywords: ['direito internacional', 'tratados', 'onu', 'união africana', 'ratificação'],
+              relatedArticleIds: ['cra-art-6', 'cra-art-26']
+            },
+            {
+              id: 'cra-art-15',
+              code: 'Artigo 15.º',
+              title: 'Terra e Recursos Naturais',
+              legalText: `1. A terra, que é propriedade originária do Estado, pode ser transmitida para pessoas singulares ou colectivas, tendo em vista o seu racional e efectivo aproveitamento, nos termos da Constituição e da lei.
+2. Os recursos naturais, minerais e petrolíferos existentes no solo, subsolo, águas interiores, mar territorial, zona económica exclusiva e plataforma continental são propriedade do Estado.`,
+              definition: 'Propriedade pública originária da terra e dos recursos minerais e energéticos de Angola.',
+              simpleExplanation: 'A terra e todas as riquezas do subsolo (como petróleo, diamantes e minerais) pertencem originalmente ao Estado Angolano.',
+              importantPoints: [
+                'Propriedade originária da terra pertence ao Estado.',
+                'Possibilidade de transmissão de direitos fundiários a particulares nos termos da lei.',
+                'Monopólio estatal sobre petróleos, minerais e recursos do mar territorial.'
+              ],
+              keywords: ['terra', 'recursos naturais', 'propriedade originária', 'petróleo', 'subsolo'],
+              relatedArticleIds: ['cra-art-3', 'cra-art-89']
+            }
+          ]
+        },
+        {
+          id: 'cra-sec-1-2',
+          title: 'Secção II – Símbolos Nacionais, Língua Oficial e Capital',
+          articles: [
+            {
+              id: 'cra-art-18',
+              code: 'Artigo 18.º',
+              title: 'Símbolos Nacionais',
+              legalText: 'São símbolos nacionais da República de Angola a Bandeira Nacional, a Insígnia Nacional e o Hino Nacional ("Angola Avante"), adoptados a 11 de Novembro de 1975.',
+              definition: 'Identidade e soberania simbólica do Estado Angolano.',
+              simpleExplanation: 'Angola possui 3 símbolos sagrados da Pátria: a Bandeira, a Insígnia e o Hino "Angola Avante", criados na data da Independência (11 de Novembro de 1975).',
+              importantPoints: [
+                '3 Símbolos Nacionais: Bandeira, Insígnia e Hino Nacional.',
+                'Data de adoção histórica: 11 de Novembro de 1975.',
+                'Respeito obrigatório por todos os cidadãos e instituições.'
+              ],
+              examAlert: 'Frequente em exames do MININT e Cultura Geral: Os 3 símbolos nacionais foram adotados a 11 de Novembro de 1975.',
+              keywords: ['símbolos nacionais', 'bandeira', 'insígnia', 'hino nacional', '11 de novembro'],
+              relatedArticleIds: ['cra-art-19', 'cra-art-20'],
               questions: [
                 {
                   id: 'q-cra-18',
@@ -227,6 +288,36 @@ export const constituicaoModule: DiplomaModule = {
                   articleRef: 'Artigo 18.º da CRA'
                 }
               ]
+            },
+            {
+              id: 'cra-art-19',
+              code: 'Artigo 19.º',
+              title: 'Línguas Oficiais e Línguas Nacionais',
+              legalText: `1. A língua oficial da República de Angola é o português.
+2. O Estado valoriza e promove o estudo, o ensino e a utilização das demais línguas de Angola, bem como das principais línguas de comunicação internacional.`,
+              definition: 'Regime linguístico constitucional e valorização do património linguístico angolano.',
+              simpleExplanation: 'O Português é a língua oficial de Angola. O Estado tem o dever de proteger, ensinar e valorizar as línguas nacionais de origem africana (como Umbundu, Kimbundu, Kikongo, Cokwe, etc.).',
+              importantPoints: [
+                'Língua oficial: Português.',
+                'Dever de valorizar e ensinar as línguas nacionais angolanas.',
+                'Promoção de línguas internacionais.'
+              ],
+              examAlert: 'Atenção para exames: A língua oficial é o Português, mas as línguas nacionais de origem africana têm proteção constitucional ativa.',
+              keywords: ['língua oficial', 'português', 'línguas nacionais', 'património cultural'],
+              relatedArticleIds: ['cra-art-18', 'cra-art-20']
+            },
+            {
+              id: 'cra-art-20',
+              code: 'Artigo 20.º',
+              title: 'Capital da República',
+              legalText: 'A capital da República de Angola é Luanda.',
+              definition: 'Fixação da sede dos órgãos de soberania e capitalidade do Estado.',
+              simpleExplanation: 'A cidade de Luanda é a capital oficial e sede política da República de Angola.',
+              importantPoints: [
+                'Capital da República de Angola: Luanda.'
+              ],
+              keywords: ['capital', 'luanda', 'sede do estado'],
+              relatedArticleIds: ['cra-art-18', 'cra-art-19']
             }
           ]
         }
@@ -241,34 +332,50 @@ export const constituicaoModule: DiplomaModule = {
           title: 'Secção I – Princípios Gerais e Direitos Individuais (Art. 22.º a 55.º)',
           articles: [
             {
+              id: 'cra-art-22',
+              code: 'Artigo 22.º',
+              title: 'Âmbito dos Direitos Fundamentais',
+              legalText: 'Todos os cidadãos gozam dos direitos, das liberdades e das garantias consagrados na Constituição e assumem os deveres estabelecidos na Constituição e na lei.',
+              definition: 'Universalidade e vinculação dos direitos fundamentais na ordem jurídica.',
+              simpleExplanation: 'Todos os angolanos têm o conjunto completo de direitos e deveres protegidos pela Constituição.',
+              importantPoints: [
+                'Princípio da universalidade dos direitos fundamentais.',
+                'Inseparabilidade entre direitos e deveres cívicos.'
+              ],
+              keywords: ['direitos fundamentais', 'universalidade', 'deveres cívicos'],
+              relatedArticleIds: ['cra-art-23', 'cra-art-26']
+            },
+            {
               id: 'cra-art-23',
               code: 'Artigo 23.º',
               title: 'Princípio da Igualdade',
               legalText: `1. Todos são iguais perante a Constituição e a lei.
 2. Ninguém pode ser prejudicado, privilegiado, privado de qualquer direito ou isento de qualquer dever em razão da sua ascendência, sexo, raça, etnia, cor, deficiência, língua, local de nascimento, religião, convicções políticas, ideológicas ou filosóficas, grau de instrução, condição económica ou social ou profissão.`,
-              definition: 'Proibição constitucional de todas as formas de discriminação injusta e garantia de tratamento uniforme.',
+              definition: 'Proibição constitucional de todas as formas de discriminação e garantia de tratamento uniforme.',
               simpleExplanation: 'Todos os cidadãos têm os mesmos direitos e deveres perante a lei, sem favoritismos nem discriminação por raça, etnia, religião, partido ou dinheiro.',
               importantPoints: [
                 'Igualdade formal e material perante a lei.',
-                'Enumeração exemplificativa e proibição de discriminação.',
-                'Aplicabilidade a todos os agentes e instituições do Estado.'
+                'Proibição de discriminação injusta.',
+                'Tratamento igual por todas as forças policiais e de segurança.'
               ],
-              questions: [],
-              flashcards: []
+              keywords: ['igualdade', 'não discriminação', 'direitos humanos', 'constituição'],
+              relatedArticleIds: ['cra-art-22', 'cra-art-30']
             },
             {
               id: 'cra-art-30',
               code: 'Artigo 30.º',
-              title: 'Direito à Vida e Proibição da Pena de Morte',
+              title: 'Direito à Vida',
               legalText: 'O Estado respeita e protege a vida da pessoa humana, que é inviolável.',
-              definition: 'Direito matriz e suporte de todos os demais direitos humanos.',
-              simpleExplanation: 'A vida é sagrada e inviolável. Em Angola a pena de morte é proibida de forma absoluta.',
+              definition: 'Direito matriz de todos os direitos humanos e suporte da pessoa humana.',
+              simpleExplanation: 'A vida é sagrada e inviolável. Em Angola a pena de morte é proibidíssima pela Constituição.',
               importantPoints: [
                 'A vida humana é inviolável.',
-                'Proibição constitucional da pena de morte (Artigo 59.º da CRA reforça esta proibição).',
-                'Dever do Estado de respeitar e proteger a vida.'
+                'Proibição constitucional da pena de morte (reforçada no Artigo 59.º).',
+                'Dever do Estado e das Forças de Segurança de proteger a vida.'
               ],
-              examAlert: 'QUESTÃO CERTA DE EXAME POLICIAL: Em Angola NÃO EXISTE pena de morte.',
+              examAlert: 'QUESTÃO CERTA DE EXAME POLICIAL: Em Angola NÃO EXISTE pena de morte em tempo algum.',
+              keywords: ['vida', 'inviolabilidade', 'pena de morte proibida', 'direitos humanos'],
+              relatedArticleIds: ['cra-art-31', 'cra-art-59', 'cra-art-60'],
               questions: [
                 {
                   id: 'q-cra-30',
@@ -294,19 +401,38 @@ export const constituicaoModule: DiplomaModule = {
               ]
             },
             {
+              id: 'cra-art-32',
+              code: 'Artigo 32.º',
+              title: 'Right to Liberty and Personal Security',
+              legalText: `1. Todos têm direito à liberdade e à segurança pessoais.
+2. Ninguém pode ser privado da liberdade, total ou parcialmente, senão em consequência de sentença judicial condenatória pela prática de acto punível por lei com pena de prisão ou em virtude de aplicação de medida de segurança decretada por decisão judicial.
+3. A excepção ao princípio consagrado no número anterior é a privação da liberdade pelo tempo estritamente necessário nos casos e condições previstos na lei (detenção em flagrante delito ou preventiva).`,
+              definition: 'Garantia constitucional da liberdade física contra detenções arbitrárias.',
+              simpleExplanation: 'Ninguém pode ser preso sem motivo legal e sem ordem judicial, exceto quando for apanhado em flagrante delito.',
+              importantPoints: [
+                'Garantia do direito à liberdade individual.',
+                'Prisão exige regra geral sentença ou decisão judicial.',
+                'Exceção: Detenção em flagrante delito pela polícia.'
+              ],
+              keywords: ['liberdade', 'segurança pessoal', 'prisão', 'flagrante delito', 'mandado'],
+              relatedArticleIds: ['cra-art-33', 'cra-art-63', 'cra-art-64']
+            },
+            {
               id: 'cra-art-33',
               code: 'Artigo 33.º',
               title: 'Inviolabilidade do Domicílio',
               legalText: `1. O domicílio é inviolável.
 2. Ninguém pode entrar ou fazer busca ou apreensão no domicílio de qualquer pessoa sem o seu consentimento, salvo nas situações previstas na Constituição e na lei, quando munido de mandado da autoridade competente, emitido nos casos e segundo as formas legalmente previstas, ou em caso de flagrante delito ou situação de emergência, para prestação de auxílio.`,
-              definition: 'Proteção da casa do cidadão contra entradas arbitrárias de forças policiais.',
-              simpleExplanation: 'A polícia não pode entrar na casa de ninguém sem mandado judicial, salvo em 2 exceções graves: flagrante delito ou emergência para socorrer pessoas.',
+              definition: 'Proteção da casa do cidadão contra buscas arbitrárias da polícia.',
+              simpleExplanation: 'A polícia não pode entrar na casa de ninguém sem mandado judicial, salvo em 2 exceções graves: flagrante delito ou emergência para prestar auxílio.',
               importantPoints: [
                 'Regra geral: Inviolabilidade do domicílio.',
-                'Requisito normal: Mandado emitido pela autoridade judicial competente.',
+                'Requisito normal: Mandado judicial de autoridade competente.',
                 'Exceções sem mandado: Flagrante delito OU situação de emergência para socorro.'
               ],
-              examAlert: 'MUITO COBRADO EM PROVAS DA POLÍCIA/SIC: Quais as exceções à necessidade de mandado judicial para busca domiciliária? Resposta: Flagrante delito ou emergência/prestação de auxílio.',
+              examAlert: 'MUITO COBRADO EM PROVAS DA POLÍCIA/SIC: Exceções à necessidade de mandado judicial: Flagrante delito ou emergência/prestação de auxílio.',
+              keywords: ['domicílio', 'inviolabilidade', 'busca e apreensão', 'mandado', 'flagrante delito'],
+              relatedArticleIds: ['cra-art-32', 'cra-art-34', 'cra-art-63'],
               questions: [
                 {
                   id: 'q-cra-33',
@@ -330,27 +456,74 @@ export const constituicaoModule: DiplomaModule = {
                   articleRef: 'Artigo 33.º da CRA'
                 }
               ]
+            },
+            {
+              id: 'cra-art-40',
+              code: 'Artigo 40.º',
+              title: 'Liberdade de Expressão e de Informação',
+              legalText: 'Todos têm o direito de exprimir, divulgar e compartilhar livremente os seus pensamentos, ideias e opiniões pela palavra, imagem ou por qualquer outro meio, bem como o direito de informar, de se informar e de ser informado, sem impedimentos nem discriminações.',
+              definition: 'Liberdade de pensamento, imprensa e comunicação sem censura prévia.',
+              simpleExplanation: 'Todos os angolanos são livres de dizer o que pensam, publicar ideias e aceder à informação verdadeira, respeitando os direitos e a honra das outras pessoas.',
+              importantPoints: [
+                'Proibição de censura prévia.',
+                'Direito de exprimir opiniões por qualquer meio.',
+                'Dever de respeitar a honra e imagem dos outros.'
+              ],
+              keywords: ['liberdade de expressão', 'informação', 'liberdade de imprensa', 'censura proibida'],
+              relatedArticleIds: ['cra-art-47', 'cra-art-69']
+            },
+            {
+              id: 'cra-art-47',
+              code: 'Artigo 47.º',
+              title: 'Liberdade de Reunião e de Manifestação',
+              legalText: `1. A todos os cidadãos é garantida a liberdade de reunião e de manifestação pacífica e sem armas, sem necessidade de qualquer autorização e nos termos da lei.
+2. As reuniões e manifestações em lugares públicos requerem prévia comunicação à autoridade competente, nos termos e para os efeitos estabelecidos na lei.`,
+              definition: 'Direito de reunião pacífica e regras de comunicação prévia às autoridades policiais.',
+              simpleExplanation: 'Os cidadãos podem manifestar-se pacificamente sem armas. Não precisam de pedir "permissão", mas devem avisar previamente a Polícia/Governo para organizar o trânsito e manter a segurança.',
+              importantPoints: [
+                'Manifestação deve ser PACÍFICA e SEM ARMAS.',
+                'NÃO exige autorização (não é pedido de permissão).',
+                'Exige PRÉVIA COMUNICAÇÃO à autoridade competente.'
+              ],
+              examAlert: 'Cai muito no MININT: Manifestação pacífica não precisa de "autorização", apenas de "prévia comunicação".',
+              keywords: ['manifestação', 'reunião pacífica', 'sem armas', 'comunicação prévia', 'polícia'],
+              relatedArticleIds: ['cra-art-40', 'cra-art-207']
             }
           ]
         },
         {
           id: 'cra-sec-2-2',
-          title: 'Secção II – Garantia dos Direitos e Liberdades (Art. 56.º a 75.º)',
+          title: 'Secção II – Garantias dos Direitos e Liberdades (Art. 56.º a 75.º)',
           articles: [
+            {
+              id: 'cra-art-59',
+              code: 'Artigo 59.º',
+              title: 'Proibição da Pena de Morte e de Penas Perpétuas',
+              legalText: '1. É proibida a pena de morte.\n2. Não pode haver penas privativas ou restritivas da liberdade com carácter perpétuo nem de duração ilimitada.',
+              definition: 'Proibição categórica da pena capital e de penas perpétuas no direito penal angolano.',
+              simpleExplanation: 'Nenhum crime em Angola pode ser punido com morte ou prisão perpétua. As penas têm obrigatoriamente um limite de anos estipulado no Código Penal.',
+              importantPoints: [
+                'Proibição absoluta da pena de morte.',
+                'Proibição de prisão perpétua.',
+                'Finalidade de reabilitação e reinserção social do réu.'
+              ],
+              keywords: ['pena de morte', 'prisão perpétua', 'proibição', 'código penal'],
+              relatedArticleIds: ['cra-art-30', 'cra-art-60']
+            },
             {
               id: 'cra-art-60',
               code: 'Artigo 60.º',
               title: 'Proibição de Tortura e Tratamentos Degradantes',
               legalText: 'Ninguém pode ser submetido a tortura, a trabalhos forçados, nem a tratamentos ou penas cruéis, desumanas ou degradantes.',
-              definition: 'Garantia absoluta e indeferível de integridade física e psíquica dos cidadãos detidos.',
-              simpleExplanation: 'A Polícia Nacional, o SIC e os Serviços Penitenciários são proibidos de agredir, torturar ou submeter detidos a maus-tratos.',
+              definition: 'Garantia absoluta de integridade física e psíquica dos cidadãos detidos.',
+              simpleExplanation: 'A Polícia Nacional, o SIC e os Serviços Penitenciários são proibidos de agredir, torturar ou submeter detidos a maus-tratos. Confissões sob tortura são nulas.',
               importantPoints: [
                 'Proibição absoluta de tortura e maus-tratos.',
-                'Proibição de trabalhos forçados e penas cruéis.',
-                'Confissões obtidas sob tortura são juridicamente NULAS.'
+                'Proibição de trabalhos forçados e tratamentos degradantes.',
+                'Nulidade jurídica de confissões obtidas sob tortura.'
               ],
-              questions: [],
-              flashcards: []
+              keywords: ['tortura', 'trabalhos forçados', 'tratamento cruel', 'integridade física', 'nulidade'],
+              relatedArticleIds: ['cra-art-30', 'cra-art-63']
             },
             {
               id: 'cra-art-63',
@@ -373,6 +546,8 @@ h) Ser conduzida perante o magistrado competente para confirmação ou libertaç
                 'Direito ao silêncio e de não produzir prova contra si mesmo (não auto-incriminação).'
               ],
               examAlert: 'MUITO IMPORTANTE PARA CONCURSOS MININT: O detido tem o direito constitucional de manter o silêncio e consultar advogado antes do interrogatório policial.',
+              keywords: ['direitos dos detidos', 'mandado de prisão', 'advogado', 'direito ao silêncio', 'não auto-incriminação'],
+              relatedArticleIds: ['cra-art-32', 'cra-art-64', 'cra-art-67'],
               questions: [
                 {
                   id: 'q-cra-63',
@@ -398,6 +573,22 @@ h) Ser conduzida perante o magistrado competente para confirmação ou libertaç
               ]
             },
             {
+              id: 'cra-art-64',
+              code: 'Artigo 64.º',
+              title: 'Prisão Preventiva e Prazos',
+              legalText: `1. A prisão preventiva tem carácter excepcional e não é decretada nem mantida sempre que puder ser aplicada caução ou outra medida de coacção mais favorável prevista na lei.
+2. A lei fixa os prazos máximos de prisão preventiva, findos os quais o arguido deve ser libertado.`,
+              definition: 'Excepcionalidade da medida extrema de prisão preventiva no processo penal.',
+              simpleExplanation: 'A prisão preventiva é o último recurso. Sempre que possível, o juiz deve aplicar termo de identidade e residência ou caução.',
+              importantPoints: [
+                'Carácter excepcional da prisão preventiva.',
+                'Substituição por medidas de coacção mais favoráveis.',
+                'Libertação imediata caso expirarem os prazos máximos legais.'
+              ],
+              keywords: ['prisão preventiva', 'excepcionalidade', 'prazos legais', 'libertação', 'medidas de coacção'],
+              relatedArticleIds: ['cra-art-63', 'cra-art-67', 'cra-art-68']
+            },
+            {
               id: 'cra-art-67',
               code: 'Artigo 67.º',
               title: 'Presunção de Inocência e Garantias de Defesa',
@@ -405,32 +596,33 @@ h) Ser conduzida perante o magistrado competente para confirmação ou libertaç
 2. Presume-se inocente todo o cidadão até ao trânsito em julgado da sentença de condenação.
 3. O arguido tem direito a escolher defensor e a ser por ele assistido em todos os actos do processo.`,
               definition: 'Princípio fundamental de processo penal que impede a presunção antecipada de culpa.',
-              simpleExplanation: 'Todo o suspeito é considerado inocente até que o tribunal emita uma condenação definitiva (trânsito em julgado). A polícia deve tratar o suspeito com dignidade.',
+              simpleExplanation: 'Todo o suspeito é considerado inocente até que o tribunal emita uma condenação definitiva (trânsito em julgado). A polícia deve tratar o suspeito com respeito.',
               importantPoints: [
                 'Presunção de inocência até ao trânsito em julgado.',
                 'Obrigatoriedade de assistência por advogado nas fases legais decisivas.',
                 'Direito de recorrer de sentenças condenatórias.'
               ],
-              questions: [],
-              flashcards: []
+              keywords: ['presunção de inocência', 'trânsito em julgado', 'direito de defesa', 'advogado'],
+              relatedArticleIds: ['cra-art-63', 'cra-art-68']
             },
             {
-              id: 'cra-art-68-69',
-              code: 'Artigos 68.º e 69.º',
-              title: 'Garantias Judiciais Especiais: Habeas Corpus e Habeas Data',
-              legalText: `• Artigo 68.º (Habeas Corpus): Todos têm o direito à providência de habeas corpus contra o abuso de poder, em virtude de prisão ou detenção ilegal, a interpor perante o tribunal competente.
-• Artigo 69.º (Habeas Data): Todos têm o direito de recorrer à providência de habeas data para assegurar o conhecimento de informações sobre si constantes de ficheiros, arquivos ou registos informáticos, exigir a sua rectificação ou actualização.`,
-              definition: 'Remédios constitucionais para tutela da liberdade física de locomoção e da informação pessoal.',
-              simpleExplanation: 'Habeas Corpus serve para libertar quem está preso ilegalmente. Habeas Data serve para consultar ou corrigir dados pessoais mantidos pelo Estado.',
+              id: 'cra-art-68',
+              code: 'Artigo 68.º',
+              title: 'Habeas Corpus',
+              legalText: 'Todos têm o direito à providência de habeas corpus contra o abuso de poder, em virtude de prisão ou detenção ilegal, a interpor perante o tribunal competente.',
+              definition: 'Garantia constitucional urgente para a libertação de quem está preso ilegalmente.',
+              simpleExplanation: 'O Habeas Corpus é uma providência judicial rápida para libertar qualquer pessoa que tenha sido presa sem justa causa ou por abuso de poder.',
               importantPoints: [
-                'Habeas Corpus = Proteção contra prisão ou detenção ilegal.',
-                'Habeas Data = Acesso, retificação e atualização de dados pessoais em ficheiros públicos.',
-                'Habeas Corpus pode ser pedido pelo próprio preso ou por qualquer pessoa.'
+                'Remédio contra prisão ou detenção ILEGAL.',
+                'Pode ser requerido pelo próprio preso ou por qualquer cidadão.',
+                'Protege a liberdade de locomoção e ir e vir.'
               ],
-              examAlert: 'COBRADO EM EXAMES: Diferenciar Habeas Corpus (liberdade física) de Habeas Data (informações e ficheiros pessoais).',
+              examAlert: 'COBRADO EM EXAMES: Habeas Corpus protege a LIBERDADE FÍSICA contra prisões ilegais.',
+              keywords: ['habeas corpus', 'prisão ilegal', 'abuso de poder', 'liberdade física', 'tribunal'],
+              relatedArticleIds: ['cra-art-63', 'cra-art-69'],
               questions: [
                 {
-                  id: 'q-cra-68-69',
+                  id: 'q-cra-68',
                   question: 'Qual é a garantia constitucional destinada a libertar um cidadão em virtude de prisão ou detenção ilegal?',
                   options: [
                     'Habeas Data.',
@@ -451,6 +643,115 @@ h) Ser conduzida perante o magistrado competente para confirmação ou libertaç
                   articleRef: 'Artigo 68.º da CRA'
                 }
               ]
+            },
+            {
+              id: 'cra-art-69',
+              code: 'Artigo 69.º',
+              title: 'Habeas Data',
+              legalText: 'Todos têm o direito de recorrer à providência de habeas data para assegurar o conhecimento de informações sobre si constantes de ficheiros, arquivos ou registos informáticos, exigir a sua rectificação ou actualização.',
+              definition: 'Garantia constitucional de acesso e retificação de dados pessoais em ficheiros públicos.',
+              simpleExplanation: 'Habeas Data serve para consultar, corrigir ou atualizar informações pessoais armazenadas em arquivos do Estado ou ficheiros informáticos.',
+              importantPoints: [
+                'Garante o conhecimento de dados pessoais em registos informáticos.',
+                'Permite exigir correcção ou eliminação de informações falsas.',
+                'Protege a intimidade e privacidade dos ficheiros policiais e estatais.'
+              ],
+              examAlert: 'Diferença vital: Habeas Corpus = Liberdade Física; Habeas Data = Dados Pessoais e Ficheiros.',
+              keywords: ['habeas data', 'dados pessoais', 'registos informáticos', 'retificação', 'privacidade'],
+              relatedArticleIds: ['cra-art-40', 'cra-art-68']
+            }
+          ]
+        },
+        {
+          id: 'cra-sec-2-3',
+          title: 'Secção III – Direitos Sociais, Económicos e Culturais (Art. 76.º a 88.º)',
+          articles: [
+            {
+              id: 'cra-art-76',
+              code: 'Artigo 76.º',
+              title: 'Direito ao Trabalho',
+              legalText: `1. O trabalho é um direito e um dever de todos.
+2. Todo o trabalhador tem direito à formação profissional, justa remuneração, descanso, férias pagas e segurança no trabalho.`,
+              definition: 'Consagração do valor social do trabalho e dos direitos fundamentais dos trabalhadores.',
+              simpleExplanation: 'O trabalho dignifica o homem e garante sustentento. O Estado deve promover o emprego e garantir condições de trabalho justas e seguras.',
+              importantPoints: [
+                'Trabalho é direito e dever de todos.',
+                'Direito a salário justo, descanso semanal e férias pagas.',
+                'Proteção contra despedimento sem justa causa.'
+              ],
+              keywords: ['trabalho', 'remuneração justa', 'férias', 'formação profissional'],
+              relatedArticleIds: ['cra-art-23', 'cra-art-199']
+            },
+            {
+              id: 'cra-art-77',
+              code: 'Artigo 77.º',
+              title: 'Direito à Saúde e Protecção Social',
+              legalText: 'O Estado promove e garante as condições necessárias para tornar efectivo o direito à protecção da saúde de todos os cidadãos, através do Serviço Nacional de Saúde (SNS).',
+              definition: 'Dever do Estado na promoção da saúde pública e assistência social universal.',
+              simpleExplanation: 'O Estado Angolano deve criar e manter hospitais públicos, centros de saúde e sistemas de segurança social para todos os cidadãos.',
+              importantPoints: [
+                'Garantia da saúde pública através do SNS.',
+                'Proteção social na maternidade, velhice e invalidez.'
+              ],
+              keywords: ['saúde pública', 'sns', 'protecção social', 'segurança social'],
+              relatedArticleIds: ['cra-art-30', 'cra-art-79']
+            }
+          ]
+        }
+      ]
+    },
+    {
+      id: 'cra-cap-3',
+      title: 'Título III – Organização Económica, Financeira e Fiscal (Artigos 89.º a 104.º)',
+      sections: [
+        {
+          id: 'cra-sec-3-1',
+          title: 'Secção I – Sistema Económico, Financeiro e Tributário',
+          articles: [
+            {
+              id: 'cra-art-89',
+              code: 'Artigo 89.º',
+              title: 'Princípios Gerais do Sistema Económico',
+              legalText: 'O sistema económico da República de Angola baseia-se na coexistência de diversos sectores de propriedade (pública, privada e cooperativa), na livre iniciativa económica e no respeito pela economia de mercado.',
+              definition: 'Modelo económico misto da República de Angola.',
+              simpleExplanation: 'Angola tem um sistema económico onde coexistem empresas públicas do Estado, empresas privadas e cooperativas em livre concorrência.',
+              importantPoints: [
+                'Coexistência de sectores de propriedade: Pública, Privada e Cooperativa.',
+                'Garantia da livre iniciativa económica e livre concorrência.',
+                'Função reguladora do Estado.'
+              ],
+              keywords: ['sistema económico', 'livre iniciativa', 'propriedade privada', 'estado'],
+              relatedArticleIds: ['cra-art-15', 'cra-art-101']
+            },
+            {
+              id: 'cra-art-101',
+              code: 'Artigo 101.º',
+              title: 'Sistema Fiscal e Impostos',
+              legalText: 'O sistema fiscal visa a satisfação das necessidades financeiras do Estado e outras entidades públicas e uma justa repartição dos rendimentos e da riqueza, nos termos da lei.',
+              definition: 'Fundamento constitucional do poder tributário do Estado e dever cívico de pagar impostos.',
+              simpleExplanation: 'Os impostos cobrados pela AGT servem para financiar os serviços públicos do Estado (escolas, hospitais, polícia e estradas).',
+              importantPoints: [
+                'Princípio da legalidade tributária: impostos só criados por lei.',
+                'Justa repartição do rendimento nacional.',
+                'Gestão transparente pela Administração Geral Tributária (AGT).'
+              ],
+              keywords: ['sistema fiscal', 'impostos', 'agt', 'orçamento do estado'],
+              relatedArticleIds: ['cra-art-89', 'cra-art-104']
+            },
+            {
+              id: 'cra-art-104',
+              code: 'Artigo 104.º',
+              title: 'Orçamento Geral do Estado (OGE)',
+              legalText: '1. O Orçamento Geral do Estado (OGE) é o instrumento de gestão financeira anual do Estado.\n2. O OGE é elaborado pelo Poder Executivo e aprovado por lei da Assembleia Nacional.',
+              definition: 'Natureza e processo de aprovação do instrumento orçamental supremo da Nação.',
+              simpleExplanation: 'O OGE é o plano anual de receitas e despesas do país. É preparado pelo Governo e tem de ser aprovado pela Assembleia Nacional.',
+              importantPoints: [
+                'Elaborado pelo Poder Executivo (Presidente/Governo).',
+                'Aprovado por LEI da Assembleia Nacional.',
+                'Fiscalizado pelo Tribunal de Contas.'
+              ],
+              keywords: ['oge', 'orçamento geral do estado', 'assembleia nacional', 'tribunal de contas'],
+              relatedArticleIds: ['cra-art-101', 'cra-art-166']
             }
           ]
         }
@@ -474,11 +775,13 @@ h) Ser conduzida perante o magistrado competente para confirmação ou libertaç
               definition: 'Mapeamento constitucional dos 3 órgãos supremos do Poder em Angola.',
               simpleExplanation: 'Existem exatamente 3 órgãos de soberania em Angola: 1. Presidente da República (Executivo), 2. Assembleia Nacional (Legislativo) e 3. Tribunais (Judicial).',
               importantPoints: [
-                'SÃO EXACTAMENTE 3 ÓRGÃOS DE SOBERANIA: Presidente da República, Assembleia Nacional e Tribunais.',
-                'O Governo/Conselho de Ministros NÃO é listado como órgão de soberania separado (está sob a chefia do PR).',
+                'EXACTAMENTE 3 ÓRGÃOS DE SOBERANIA: Presidente da República, Assembleia Nacional e Tribunais.',
+                'O Governo/Conselho de Ministros NÃO é um órgão de soberania autónomo (está integrado na Chefia do PR).',
                 'Devem respeitar a separação e interdependência de funções.'
               ],
-              examAlert: 'PERGUNTA CLÁSSICA DE CONCURSO: Quais são os órgãos de soberania em Angola? Resposta: Presidente da República, Assembleia Nacional e Tribunais.',
+              examAlert: 'PERGUNTA CLÁSSICA DE CONCURSO: QUAIS SÃO OS ÓRGAOS DE SOBERANIA EM ANGOLA? Resposta: Presidente da República, Assembleia Nacional e Tribunais.',
+              keywords: ['órgãos de soberania', 'presidente da república', 'assembleia nacional', 'tribunais', 'separação de poderes'],
+              relatedArticleIds: ['cra-art-2', 'cra-art-108', 'cra-art-141', 'cra-art-174'],
               questions: [
                 {
                   id: 'q-cra-105',
@@ -511,19 +814,19 @@ h) Ser conduzida perante o magistrado competente para confirmação ou libertaç
 2. O Presidente da República exerce o poder executivo, auxiliado por um Vice-Presidente, Ministros de Estado e Ministros.
 3. O Presidente da República promove e assegura a unidade nacional, a independência e a integridade territorial do País.`,
               definition: 'A tripla qualidade do Presidente da República no sistema constitucional angolano.',
-              simpleExplanation: 'O Presidente acumula 3 funções essenciais: Chefe de Estado, Chefe do Governo (Poder Executivo) e Comandante-em-Chefe das Forças Armadas (FAA).',
+              simpleExplanation: 'O Presidente acumula 3 funções essenciais: Chefe de Estado, Titular do Governo (Poder Executivo) e Comandante-em-Chefe das Forças Armadas (FAA).',
               importantPoints: [
                 'Triplo papel: Chefe de Estado, Titular do Poder Executivo e Comandante-em-Chefe das FAA.',
                 'Auxiliado por Vice-Presidente, Ministros de Estado e Ministros.',
                 'Mandato de 5 anos (máximo de 2 mandatos nos termos do Artigo 113.º).'
               ],
-              questions: [],
-              flashcards: []
+              keywords: ['presidente da república', 'chefe de estado', 'executivo', 'comandante em chefe', 'faa'],
+              relatedArticleIds: ['cra-art-105', 'cra-art-122', 'cra-art-131']
             },
             {
               id: 'cra-art-122',
               code: 'Artigo 122.º',
-              title: 'Competências do Comandante-em-Chefe e Nomeação de Comandantes do MININT',
+              title: 'Competências do Comandante-em-Chefe e Nomeação de Comandantes do MININT/PNA',
               legalText: `Compete ao Presidente da República, como Comandante-em-Chefe das Forças Armadas Angolanas:
 a) Exercer as funções de Comandante em Chefe;
 b) Nomear e exonerar o Chefe do Estado-Maior General das FAA;
@@ -531,13 +834,15 @@ f) Nomear e exonerar o Comandante Geral da Polícia Nacional e os 2.ºs Comandan
 h) Promover e graduar os oficiais comissários da Polícia Nacional;
 i) Nomear e exonerar os titulares dos órgãos de inteligência e segurança de Estado.`,
               definition: 'Poder de comando e provimento dos cargos de cúpula da Polícia e Forças Armadas.',
-              simpleExplanation: 'É o Presidente da República que nomeia e exonera o Comandante Geral da Polícia Nacional e promove os Oficiais Comissários da PNA.',
+              simpleExplanation: 'É o Presidente da República que nomeia e exonera o Comandante Geral da Polícia Nacional, os seus adjuntos e promove os Oficiais Comissários da PNA.',
               importantPoints: [
                 'Nomeação e exoneração do Comandante Geral da PNA e 2.ºs Comandantes.',
                 'Ouvir previamente o Conselho de Segurança Nacional.',
                 'Promoção e graduação dos Oficiais Comissários da Polícia.'
               ],
               examAlert: 'Frequente em exames do MININT: Quem nomeia o Comandante Geral da PNA? Resposta: O Presidente da República e Comandante-em-Chefe.',
+              keywords: ['comandante geral', 'pna', 'minint', 'nomeação', 'oficiais comissários', 'presidente'],
+              relatedArticleIds: ['cra-art-108', 'cra-art-131', 'cra-art-207'],
               questions: [
                 {
                   id: 'q-cra-122',
@@ -553,14 +858,86 @@ i) Nomear e exonerar os titulares dos órgãos de inteligência e segurança de 
                   examContext: 'Atribuições do Chefe de Estado'
                 }
               ],
-              flashcards: []
+              flashcards: [
+                {
+                  id: 'fc-cra-122',
+                  front: 'Quem tem a competência constitucional de nomear o Comandante Geral da Polícia Nacional?',
+                  back: 'O Presidente da República e Comandante-em-Chefe das FAA (Artigo 122.º, alínea f).',
+                  articleRef: 'Artigo 122.º da CRA'
+                }
+              ]
+            },
+            {
+              id: 'cra-art-131',
+              code: 'Artigo 131.º',
+              title: 'Conselho de Segurança Nacional',
+              legalText: 'O Conselho de Segurança Nacional é o órgão de consulta do Presidente da República para os assuntos relativos à condução da política e da estratégia de segurança nacional, defesa do país e manutenção da ordem pública.',
+              definition: 'Órgão de consulta suprema para a defesa e segurança nacional.',
+              simpleExplanation: 'O Conselho de Segurança Nacional aconselha o Presidente em decisões estratégicas sobre defesa do país, policiamento, fronteiras e inteligência estatal.',
+              importantPoints: [
+                'Órgão consultivo presidencial para segurança nacional e ordem pública.',
+                'Membros incluem o Vice-Presidente, Ministros de Defesa e Interior, Comandante Geral da PNA e Chefes do Exército e Inteligência.'
+              ],
+              keywords: ['conselho de segurança nacional', 'ordem pública', 'defesa', 'política de segurança'],
+              relatedArticleIds: ['cra-art-122', 'cra-art-202']
             }
           ]
         },
         {
           id: 'cra-sec-4-2',
-          title: 'Secção II – Poder Judicial e Tribunais (Art. 174.º a 197.º)',
+          title: 'Secção II – Poder Legislativo – Assembleia Nacional (Art. 141.º a 173.º)',
           articles: [
+            {
+              id: 'cra-art-141',
+              code: 'Artigo 141.º',
+              title: 'Assembleia Nacional',
+              legalText: 'A Assembleia Nacional é o parlamento da República de Angola, sendo o órgão representativo de todos os angolanos e de expressão do poder legislativo.',
+              definition: 'Parlamento unicameral da República de Angola.',
+              simpleExplanation: 'A Assembleia Nacional é onde os Deputados eleitos pelo povo debatem e aprovam as leis de Angola.',
+              importantPoints: [
+                'Órgão legislativo representativo de todo o povo angolano.',
+                'Composta por 220 Deputados.',
+                'Aprova as Leis e o Orçamento Geral do Estado.'
+              ],
+              keywords: ['assembleia nacional', 'parlamento', 'deputados', 'leis', 'poder legislativo'],
+              relatedArticleIds: ['cra-art-105', 'cra-art-166']
+            },
+            {
+              id: 'cra-art-166',
+              code: 'Artigo 166.º',
+              title: 'Actos Legislativos – Leis e Resoluções',
+              legalText: '1. Os actos legislativos da Assembleia Nacional tomam a forma de Leis Constitucionais, Leis Orgânicas, Leis Bases e Leis Ordinárias.\n2. Os demais actos tomam a forma de Resoluções.',
+              definition: 'Tipologia dos actos normativos emanados do Parlamento angolano.',
+              simpleExplanation: 'As decisões do Parlamento tomam a forma de Leis (para reger o país) ou Resoluções (para aprovar tratados e decisões internas).',
+              importantPoints: [
+                'Leis Orgânicas: ex. Leis do Sistema de Segurança, Eleitoral e Tribunais.',
+                'Hierarquia: Lei Constitucional > Lei Orgânica > Lei Ordinária.'
+              ],
+              keywords: ['leis orgânicas', 'actos legislativos', 'resoluções', 'hierarquia das normas'],
+              relatedArticleIds: ['cra-art-6', 'cra-art-141']
+            }
+          ]
+        },
+        {
+          id: 'cra-sec-4-3',
+          title: 'Secção III – Poder Judicial e Tribunais (Art. 174.º a 197.º)',
+          articles: [
+            {
+              id: 'cra-art-174',
+              code: 'Artigo 174.º',
+              title: 'Função Jurisdicional e Independência dos Tribunais',
+              legalText: `1. Os Tribunais são órgãos de soberania com competência para administrar a justiça em nome do povo.
+2. No exercício da função jurisdicional, os tribunais são independentes e imparciais, estando apenas sujeitos à Constituição e à lei.`,
+              definition: 'Independência e exclusividade do Poder Judicial.',
+              simpleExplanation: 'Apenas os Tribunais e Juízes têm o poder de julgar e condenar criminosos. Nem o Presidente nem a Polícia podem interferir nas decisões dos juízes.',
+              importantPoints: [
+                'Independência e imparcialidade judicial.',
+                'Subordinação exclusiva à Constituição e à Lei.',
+                'Decisões dos tribunais são de cumprimento obrigatório para todos.'
+              ],
+              keywords: ['tribunais', 'função jurisdicional', 'independência judicial', 'juízes'],
+              relatedArticleIds: ['cra-art-105', 'cra-art-176']
+            },
             {
               id: 'cra-art-176',
               code: 'Artigo 176.º',
@@ -570,31 +947,31 @@ i) Nomear e exonerar os titulares dos órgãos de inteligência e segurança de 
 a) Jurisdição comum encabeçada pelo Tribunal Supremo;
 b) Jurisdição militar encabeçada pelo Supremo Tribunal Militar.
 3. É proibida a criação de tribunais com competência exclusiva para o julgamento de determinadas infracções (tribunais de excepção).`,
-              definition: 'Arquitetura do Poder Judicial e proibição de tribunais ad hoc ou de excepção.',
-              simpleExplanation: 'Existem 4 Tribunais Superiores em Angola: Constitucional, Supremo, Contas e Supremo Tribunal Militar. Proibição de tribunais de exceção.',
+              definition: 'Arquitetura dos Tribunais Superiores em Angola e proibição de tribunais ad hoc ou de exceção.',
+              simpleExplanation: 'Existem 4 Tribunais Superiores em Angola: 1. Constitucional, 2. Supremo, 3. de Contas e 4. Supremo Tribunal Militar. É proibido criar tribunais de exceção.',
               importantPoints: [
                 '4 Tribunais Superiores: Tribunal Constitucional, Tribunal Supremo, Tribunal de Contas e Supremo Tribunal Militar.',
                 'Tribunal Supremo encabeça a jurisdição comum.',
                 'Proibição absoluta de tribunais de exceção.'
               ],
-              questions: [],
-              flashcards: []
+              keywords: ['tribunal constitucional', 'tribunal supremo', 'tribunal de contas', 'supremo tribunal militar', 'tribunais superiores'],
+              relatedArticleIds: ['cra-art-174', 'cra-art-180', 'cra-art-181']
             },
             {
-              id: 'cra-art-185-189',
-              code: 'Artigos 185.º e 189.º',
-              title: 'Ministério Público e Procuradoria-Geral da República (PGR)',
-              legalText: `• Artigo 185.º: O Ministério Público é o órgão da Procuradoria-Geral da República essencial à função jurisdicional, dotado de autonomia e vinculação à legalidade.
-• Artigo 186.º: Compete ao Ministério Público representar o Estado, exercer a acção penal e dirigir a fase preparatória dos processos penais.
-• Artigo 189.º: A Procuradoria-Geral da República (PGR) é dirigida pelo Procurador-Geral da República, nomeado pelo Presidente da República por proposta do Conselho Superior da Magistratura do Ministério Público, para mandato de 5 anos (renovável uma vez).`,
-              definition: 'Estatuto do órgão responsável pelo exercício da ação penal e fiscalização da instrução preparatória.',
-              simpleExplanation: 'O Ministério Público (PGR) representa o Estado nos tribunais, acusa os criminosos e dirige a instrução preparatória exercida pelos investigadores do SIC.',
+              id: 'cra-art-186',
+              code: 'Artigo 186.º',
+              title: 'Competências do Ministério Público (PGR)',
+              legalText: `Compete ao Ministério Público representar o Estado, defender a legalidade democrática e os interesses que a lei determinar, exercer a acção penal, dirigir a fase de instrução preparatória dos processos penais e promover a execução das penas.`,
+              definition: 'Atribuições constitucionais da Procuradoria-Geral da República no processo penal.',
+              simpleExplanation: 'O Ministério Público (PGR) é o órgão que acusa os criminosos nos tribunais e fiscaliza a investigação criminal realizada pelos investigadores do SIC.',
               importantPoints: [
                 'Dirige a instrução preparatória dos processos penais.',
-                'Ejerce em exclusivo a ação penal pública.',
-                'PGR nomeado pelo PR sob proposta do CSMMP para mandato de 5 anos.'
+                'Exerce em exclusivo a ação penal pública.',
+                'Fiscaliza a legalidade na atuação das forças policiais e nos estabelecimentos prisionais.'
               ],
-              examAlert: 'COBRADO EM CONCURSOS SIC/MININT: Quem dirige a fase de instrução preparatória dos processos-crime? Resposta: O Ministério Público.',
+              examAlert: 'COBRADO EM CONCURSOS SIC/MININT: Quem dirige a fase de instrução preparatória dos processos penais? Resposta: O Ministério Público.',
+              keywords: ['ministério público', 'pgr', 'instrução preparatória', 'acção penal', 'sic'],
+              relatedArticleIds: ['cra-art-189', 'cra-art-209'],
               questions: [
                 {
                   id: 'q-cra-186',
@@ -606,11 +983,18 @@ b) Jurisdição militar encabeçada pelo Supremo Tribunal Militar.
                     'Ao Governador Provincial.'
                   ],
                   correctAnswer: 1,
-                  explanation: 'Nos termos do Artigo 186.º, alínea f), cabe ao Ministério Público dirigir a fase de instrução preparatória dos processos penais.',
+                  explanation: 'Nos termos do Artigo 186.º, cabe ao Ministério Público dirigir a fase de instrução preparatória dos processos penais.',
                   examContext: 'Processo Penal e Atuação do SIC'
                 }
               ],
-              flashcards: []
+              flashcards: [
+                {
+                  id: 'fc-cra-186',
+                  front: 'Quem dirige a instrução preparatória no processo penal angolano?',
+                  back: 'O Ministério Público (Procuradoria-Geral da República) nos termos do Artigo 186.º da CRA.',
+                  articleRef: 'Artigo 186.º da CRA'
+                }
+              ]
             }
           ]
         }
@@ -622,7 +1006,44 @@ b) Jurisdição militar encabeçada pelo Supremo Tribunal Militar.
       sections: [
         {
           id: 'cra-sec-5-1',
-          title: 'Secção I – Segurança Nacional, Forças Armadas e Polícia Nacional',
+          title: 'Secção I – Administração Pública e Função Pública (Art. 198.º a 201.º)',
+          articles: [
+            {
+              id: 'cra-art-198',
+              code: 'Artigo 198.º',
+              title: 'Princípios Fundamentais da Administração Pública',
+              legalText: `1. A Administração Pública visa a satisfação das necessidades colectivas, devendo na sua actuação obedecer aos princípios da legalidade, igualdade, proporcionalidade, justiça, imparcialidade, boa-fé, eficiência, probidade pública e transparência.
+2. A Administração Pública é estruturada de forma a evitar a burocratização e aproxima os serviços das populações.`,
+              definition: 'Princípios regentes de todos os serviços públicos, ministérios e concursos públicos.',
+              simpleExplanation: 'Tudo o que o Estado, os Ministérios e as Polícias fazem deve seguir os princípios de justiça, honestidade, rapidez, transparência e respeito pelo cidadão.',
+              importantPoints: [
+                'Princípios essenciais: Legalidade, Proporcionalidade, Imparcialidade, Probidade Pública e Eficiência.',
+                'Desburocratização e aproximação aos cidadãos.',
+                'Probidade pública obriga à honestidade absoluta na gestão do erário público.'
+              ],
+              keywords: ['administração pública', 'probidade pública', 'eficiência', 'proporcionalidade', 'legalidade'],
+              relatedArticleIds: ['cra-art-2', 'cra-art-199']
+            },
+            {
+              id: 'cra-art-199',
+              code: 'Artigo 199.º',
+              title: 'Estatuto dos Funcionários Públicos e Concursos Públicos',
+              legalText: `1. Os funcionários e demais agentes públicos estão ao serviço exclusivo do interesse público.
+2. O acesso às funções públicas faz-se mediante concurso público, salvo nos casos expressamente previstos na lei.`,
+              definition: 'Exigência constitucional do concurso público como regra geral de ingresso na Função Pública.',
+              simpleExplanation: 'Para trabalhar na Função Pública (professores, médicos, agentes da polícia, inspetores) o ingresso faz-se obrigatoriamente por Concurso Público transparente.',
+              importantPoints: [
+                'Regra geral imperativa: Ingresso mediante CONCURSO PÚBLICO.',
+                'Dever de imparcialidade e serviço exclusivo do interesse público.'
+              ],
+              keywords: ['concurso público', 'função pública', 'funcionário público', 'ingresso'],
+              relatedArticleIds: ['cra-art-198', 'cra-art-207']
+            }
+          ]
+        },
+        {
+          id: 'cra-sec-5-2',
+          title: 'Secção II – Segurança Nacional, Forças Armadas, Polícia Nacional e Órgãos de Investigação (Art. 202.º a 212.º)',
           articles: [
             {
               id: 'cra-art-202',
@@ -631,14 +1052,14 @@ b) Jurisdição militar encabeçada pelo Supremo Tribunal Militar.
               legalText: `1. Compete ao Estado, com a participação dos cidadãos, garantir a segurança nacional, observando a Constituição e a lei.
 2. A segurança nacional tem por objectivo a garantia da salvaguarda da independência e soberania nacionais, da integridade territorial, do Estado democrático de direito e da defesa contra ameaças internas e externas.`,
               definition: 'Conceito e dever estatal/cívico de preservação da segurança pública e integridade territorial.',
-              simpleExplanation: 'A segurança nacional é um dever do Estado e de todos os cidadãos para proteger a paz, o território e a democracia contra ameaças.',
+              simpleExplanation: 'A segurança nacional é um dever do Estado e de todos os cidadãos para proteger a paz, o território e a democracia contra ameaças internas ou externas.',
               importantPoints: [
                 'Garantida pelo Estado com a participação ativa dos cidadãos.',
                 'Proteção contra ameaças internas e externas.',
                 'Respeito estrito pelos Direitos Humanos.'
               ],
-              questions: [],
-              flashcards: []
+              keywords: ['segurança nacional', 'ordem pública', 'defesa do estado', 'participação dos cidadãos'],
+              relatedArticleIds: ['cra-art-131', 'cra-art-207']
             },
             {
               id: 'cra-art-207',
@@ -647,19 +1068,21 @@ b) Jurisdição militar encabeçada pelo Supremo Tribunal Militar.
               legalText: `1. As Forças Armadas e a Polícia Nacional são instituições nacionais, permanentes, regulares e apartidárias.
 2. A Polícia Nacional é a instituição nacional policial, permanente, regular e apartidária, organizada na base da hierarquia e da disciplina, incumbida da protecção e asseguramento policial do País, no estrito respeito pela Constituição e pelas leis, bem como pelas convenções internacionais.
 3. A Polícia Nacional compõe-se exclusivamente de cidadãos angolanos e a sua organização é única para todo o território nacional.`,
-              definition: 'Artigo fundamental que rege a Polícia Nacional de Angola.',
+              definition: 'Artigo fundamental que define a natureza e missão da Polícia Nacional de Angola.',
               simpleExplanation: 'A Polícia Nacional é um órgão permanente do Estado, único em todo o país, constituído apenas por cidadãos angolanos, apartidário (sem partidos) e regido pela disciplina e hierarquia.',
               importantPoints: [
-                '4 ADJETIVOS ESSENCIAIS: Nacional, Permanente, Regular e APARTIDÁRIA.',
+                '4 ATRIBUTOS OBRIGATÓRIOS: Nacional, Permanente, Regular e APARTIDÁRIA.',
                 'Base institucional: Hierarquia e Disciplina.',
-                'Composição: Exclusivamente por cidadãos angolanos (proibidos estrangeiros no seu efetivo).',
+                'Composição: Exclusivamente por cidadãos angolanos.',
                 'Organização única para todo o território nacional.'
               ],
               examAlert: 'QUESTÃO DE OURO EM CONCURSOS PNA/MININT: Memorize os 4 carateres da Polícia Nacional: NACIONAL, PERMANENTE, REGULAR e APARTIDÁRIA.',
+              keywords: ['polícia nacional', 'pna', 'apartidária', 'permanente', 'hierarquia', 'disciplina'],
+              relatedArticleIds: ['cra-art-122', 'cra-art-202', 'cra-art-209'],
               questions: [
                 {
                   id: 'q-cra-207-pna',
-                  question: 'Como se carateriza a Polícia Nacional no Artigo 210.º / 207.º da Constituição da República de Angola?',
+                  question: 'Como se carateriza a Polícia Nacional no Artigo 207.º da Constituição da República de Angola?',
                   options: [
                     'Como força voluntária municipal e partidária.',
                     'Como instituição nacional, permanente, regular e apartidária, composta exclusivamente por cidadãos angolanos.',
@@ -674,27 +1097,42 @@ b) Jurisdição militar encabeçada pelo Supremo Tribunal Militar.
               flashcards: [
                 {
                   id: 'fc-cra-207',
-                  front: 'Quais os 4 atributos da Polícia Nacional segundo a Constituição?',
+                  front: 'Quais os 4 atributos essenciais da Polícia Nacional segundo a Constituição (Art. 207.º)?',
                   back: '1. Nacional\n2. Permanente\n3. Regular\n4. Apartidária',
-                  articleRef: 'Artigo 207.º / 210.º da CRA'
+                  articleRef: 'Artigo 207.º da CRA'
                 }
               ]
             },
             {
+              id: 'cra-art-209',
+              code: 'Artigo 209.º',
+              title: 'Órgãos de Investigação Criminal e Criminalística (SIC)',
+              legalText: 'A investigação criminal e as acções de prevenção e repressão do crime organizado, cibercrime e criminalidade complexa são executadas por órgãos especializados da administração do Estado (Serviço de Investigação Criminal - SIC), atuando sob direção funcional do Ministério Público.',
+              definition: 'Mapeamento constitucional dos órgãos estatais de investigação criminal e ciência forense.',
+              simpleExplanation: 'O Serviço de Investigação Criminal (SIC) investiga crimes, recolhe provas e atua sob coordenação do Ministério Público para levar os suspeitos a tribunal.',
+              importantPoints: [
+                'Especialização no combate ao crime organizado e cibercrime.',
+                'Atuação sob direção funcional do Ministério Público.',
+                'Uso da ciência criminalística para instrução do processo.'
+              ],
+              keywords: ['sic', 'investigação criminal', 'cibercrime', 'ministério público', 'criminalística'],
+              relatedArticleIds: ['cra-art-186', 'cra-art-207']
+            },
+            {
               id: 'cra-art-211-212',
               code: 'Artigos 211.º e 212.º',
-              title: 'Preservação da Segurança do Estado e Órgãos de Inteligência',
+              title: 'Preservação da Segurança do Estado e Órgãos de Inteligência (SINSE e SIE)',
               legalText: `• Artigo 211.º: A preservação da segurança do Estado visa a salvaguarda do Estado democrático de direito contra a criminalidade violenta ou organizada, no respeito da Constituição.
-• Artigo 212.º: Os órgãos de inteligência e de segurança do Estado são órgãos incumbidos de realizar a produção de informações e análises e adopção de medidas necessárias à preservação do Estado democrático de direito e da paz pública.`,
-              definition: 'Mapeamento constitucional dos serviços de informação e inteligência estatal (SINSE, SIE, SIME).',
-              simpleExplanation: 'Os serviços de inteligência recolhem informações cruciais para combater o crime organizado e proteger o país contra ameaças à paz pública.',
+• Artigo 212.º: Os órgãos de inteligência e de segurança do Estado são órgãos incumbidos de realizar a produção de informações e análises necessárias à preservação do Estado democrático de direito e da paz pública.`,
+              definition: 'Mapeamento constitucional dos serviços de inteligência estatal (SINSE, SIE, SIME).',
+              simpleExplanation: 'Os serviços de inteligência recolhem informações estratégicas cruciais para combater a criminalidade organizada e proteger a paz pública do país.',
               importantPoints: [
-                'Produção de informações e análises para segurança do Estado.',
+                'Produção de informações estratégicas para a segurança do Estado.',
                 'Combate à criminalidade violenta e organizada.',
                 'Subordinação rigorosa à Constituição e Direitos Fundamentais.'
               ],
-              questions: [],
-              flashcards: []
+              keywords: ['inteligência', 'sinse', 'sie', 'segurança do estado', 'informações'],
+              relatedArticleIds: ['cra-art-122', 'cra-art-202']
             }
           ]
         }
@@ -702,26 +1140,120 @@ b) Jurisdição militar encabeçada pelo Supremo Tribunal Militar.
     },
     {
       id: 'cra-cap-6',
-      title: 'Título VI e VII – Poder Local e Revisão Constitucional (Artigos 213.º a 237.º)',
+      title: 'Título VI – Poder Local e Autarquias Locais (Artigos 213.º a 225.º)',
       sections: [
         {
           id: 'cra-sec-6-1',
-          title: 'Secção I – Poder Local, Autarquias e Poder Tradicional (Art. 213.º a 225.º)',
+          title: 'Secção I – Descentralização, Autarquias Locais e Poder Tradicional',
           articles: [
             {
-              id: 'cra-art-213-217',
-              code: 'Artigos 213.º e 217.º',
-              title: 'Autarquias Locais e Princípio da Autonomia Local',
-              legalText: `• Artigo 213.º: A organização democrática do Estado ao nível local estrutura-se com base no princípio da descentralização político-administrativa (Autarquias Locais, instituições do poder tradicional).
-• Artigo 217.º: As Autarquias Locais são pessoas colectivas territoriais que asseguram os interesses específicos das populações e organizam-se nos municípios.`,
+              id: 'cra-art-213',
+              code: 'Artigo 213.º',
+              title: 'Autonomia Local e Descentralização',
+              legalText: '1. A organização democrática do Estado ao nível local estrutura-se com base no princípio da descentralização político-administrativa.\n2. As formas de poder local compreendem as Autarquias Locais, as instituições do poder tradicional e outras formas de participação dos cidadãos.',
               definition: 'Descentralização territorial e criação das autarquias locais angolanas.',
               simpleExplanation: 'O poder local é exercido através de Autarquias Municipais eleitas pela população local e pelo respeito ao Poder Tradicional (Sobas e Autoridades Tradicionais).',
               importantPoints: [
-                'Descentralização político-administrativa.',
-                'Autarquias organizam-se nos municípios.',
-                'Artigo 242.º consagra o Princípio do Gradualismo na criação das autarquias.'
+                'Princípio da descentralização político-administrativa.',
+                'Estruturação em Autarquias Locais nos municípios.',
+                'Reconhecimento das autoridades do Poder Tradicional.'
               ],
-              examAlert: 'Frequente em exames: A implementação das autarquias locais obedece ao Princípio do Gradualismo (Artigo 242.º da CRA).',
+              keywords: ['descentralização', 'autarquias locais', 'poder local', 'municípios', 'poder tradicional'],
+              relatedArticleIds: ['cra-art-217', 'cra-art-242']
+            },
+            {
+              id: 'cra-art-223',
+              code: 'Artigo 223.º',
+              title: 'Poder Tradicional',
+              legalText: 'O Estado reconhece o estatuto, o papel e as instituições do poder tradicional constituídas segundo o direito costumeiro que não contrarie a Constituição e a lei.',
+              definition: 'Reconhecimento constitucional da autoridade tradicional costumeira (Sobas e Autoridades Étnicas).',
+              simpleExplanation: 'O Estado Angolano respeita e apoia os Sobas e Autoridades Tradicionais que resolvem litígios comunitários segundo os costumes e sem violar a Constituição.',
+              importantPoints: [
+                'Reconhecimento do direito costumeiro compatível com a Constituição.',
+                'Papel social de pacificação nas comunidades rurais e urbanas.'
+              ],
+              keywords: ['poder tradicional', 'sobas', 'direito costumeiro', 'comunidades'],
+              relatedArticleIds: ['cra-art-213']
+            }
+          ]
+        }
+      ]
+    },
+    {
+      id: 'cra-cap-7',
+      title: 'Título VII – Garantias da Constituição e Revisão Constitucional (Artigos 226.º a 237.º)',
+      sections: [
+        {
+          id: 'cra-sec-7-1',
+          title: 'Secção I – Fiscalização da Inconstitucionalidade e Limites de Revisão',
+          articles: [
+            {
+              id: 'cra-art-226',
+              code: 'Artigo 226.º',
+              title: 'Inconstitucionalidade por Acção e por Omissão',
+              legalText: 'São inconstitucionais os actos que contrariem os princípios e normas consagrados na presente Constituição.',
+              definition: 'Fiscalização da conformidade de todas as leis e decretos com a Constituição.',
+              simpleExplanation: 'Se uma lei ou regulamento for feito contra a Constituição, o Tribunal Constitucional declara essa lei nula (inconstitucional).',
+              importantPoints: [
+                'Inconstitucionalidade por acção (leis contrárias à CRA).',
+                'Inconstitucionalidade por omissão (falta de regulamentação necessária).',
+                'Competência exclusiva do Tribunal Constitucional.'
+              ],
+              keywords: ['inconstitucionalidade', 'tribunal constitucional', 'fiscalização', 'invalidade'],
+              relatedArticleIds: ['cra-art-6', 'cra-art-180', 'cra-art-236']
+            },
+            {
+              id: 'cra-art-236',
+              code: 'Artigo 236.º',
+              title: 'Limites Materiais de Revisão da Constituição (Cláusulas Pétreas)',
+              legalText: `As alterações da Constituição têm de respeitar os seguintes limites materiais:
+a) A dignidade da pessoa humana;
+b) A independência, integridade territorial e unidade nacional;
+c) A forma republicana de governo;
+d) A natureza unitária do Estado;
+e) O núcleo essencial dos direitos, liberdades e garantias;
+f) O Estado de direito e a democracia pluralista;
+g) A laicidade do Estado e separação entre Estado e igrejas;
+h) O sufrágio universal, directo, secreto e periódico;
+i) A independência dos Tribunais;
+j) A separação e interdependência dos órgãos de soberania;
+k) A autonomia local.`,
+              definition: 'Cláusulas pétreas ou limites intransponíveis que nem a Assembleia Nacional pode abolir.',
+              simpleExplanation: 'Existem matérias sagradas na Constituição que NENHUMA revisão constitucional pode alterar, como os Direitos Fundamentais, a Independência de Angola, a Laicidade do Estado e as Eleições.',
+              importantPoints: [
+                'Conhecidas como cláusulas pétreas da Constituição de Angola.',
+                'Proíbem a eliminação dos direitos fundamentais, laicidade e separação de poderes.',
+                'Garantem a perpetuidade da República e da Democracia.'
+              ],
+              keywords: ['limites materiais', 'cláusulas pétreas', 'revisão constitucional', 'dignidade humana'],
+              relatedArticleIds: ['cra-art-1', 'cra-art-2', 'cra-art-6']
+            }
+          ]
+        }
+      ]
+    },
+    {
+      id: 'cra-cap-8',
+      title: 'Título VIII – Disposições Finais e Transitórias (Artigos 238.º a 244.º)',
+      sections: [
+        {
+          id: 'cra-sec-8-1',
+          title: 'Secção I – Gradualismo e Entrada em Vigor',
+          articles: [
+            {
+              id: 'cra-art-242',
+              code: 'Artigo 242.º',
+              title: 'Princípio do Gradualismo nas Autarquias Locais',
+              legalText: 'A institucionalização efectiva das autarquias locais obedece ao princípio do gradualismo, nos termos da lei.',
+              definition: 'Transição progressiva para a implementação total das eleições municipais autárquicas.',
+              simpleExplanation: 'A criação das autarquias em Angola é feita de forma faseada/gradual para assegurar capacidade financeira e administrativa em cada município.',
+              importantPoints: [
+                'Regra do GRADUALISMO na criação das autarquias.',
+                'Tema altamente debatido e cobrado em provas de Função Pública e Direito Constitucional.'
+              ],
+              examAlert: 'Frequente em exames: A institucionalização das autarquias locais obedece ao Princípio do Gradualismo (Artigo 242.º da CRA).',
+              keywords: ['gradualismo', 'autarquias locais', 'transição', 'municípios'],
+              relatedArticleIds: ['cra-art-213'],
               questions: [
                 {
                   id: 'q-cra-242',
@@ -741,36 +1273,10 @@ b) Jurisdição militar encabeçada pelo Supremo Tribunal Militar.
                 {
                   id: 'fc-cra-242',
                   front: 'Qual princípio rege a criação das autarquias locais segundo o Artigo 242.º da CRA?',
-                  back: 'O Princípio do Gradualismo.',
+                  back: 'O Princípio do Gradualismo (Artigo 242.º).',
                   articleRef: 'Artigo 242.º da CRA'
                 }
               ]
-            },
-            {
-              id: 'cra-art-236',
-              code: 'Artigo 236.º',
-              title: 'Limites Materiais de Revisão da Constituição',
-              legalText: `As alterações da Constituição têm de respeitar os seguintes limites materiais:
-a) A dignidade da pessoa humana;
-b) A independência, integridade territorial e unidade nacional;
-c) A forma republicana de governo;
-d) A natureza unitária do Estado;
-e) O núcleo essencial dos direitos, liberdades e garantias;
-f) O Estado de direito e a democracia pluralista;
-g) A laicidade do Estado e separação entre Estado e igrejas;
-h) O sufrágio universal, directo, secreto e periódico;
-i) A independência dos Tribunais;
-j) A separação e interdependência dos órgãos de soberania;
-k) A autonomia local.`,
-              definition: 'Cláusulas pétreas ou limites intransponíveis que nem a Assembleia Nacional pode abolir.',
-              simpleExplanation: 'Existem matérias sagradas que NENHUMA revisão constitucional pode alterar, como a independência de Angola, a forma de República, a laicidade do Estado e os Direitos Fundamentais.',
-              importantPoints: [
-                'Conhecidas como cláusulas pétreas da Constituição de Angola.',
-                'Proíbem a eliminação dos direitos fundamentais, laicidade e separação de poderes.',
-                'Garantem a sustentabilidade do Estado Democrático de Direito.'
-              ],
-              questions: [],
-              flashcards: []
             }
           ]
         }

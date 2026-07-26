@@ -226,8 +226,8 @@ export default function App() {
           />
         </div>
 
-        {/* DESKTOP EXPLORER */}
-        {explorerOpen && viewMode === 'reader' && (
+        {/* DESKTOP EXPLORER (SYSTEMATIC SIDEBAR COMPARTMENTS) */}
+        {explorerOpen && (
           <div className="hidden md:flex flex-shrink-0 h-full">
             <Explorer
               moduleData={currentModule}
@@ -243,6 +243,8 @@ export default function App() {
               studiedArticleIds={progress.studiedArticleIds}
               theme={progress.theme}
               onCloseExplorer={() => setExplorerOpen(false)}
+              activeTab={activeTab}
+              onSelectTab={handleSelectTab}
             />
           </div>
         )}
@@ -270,25 +272,28 @@ export default function App() {
             onOpenStatsModal={() => setStatsModalOpen(true)}
           />
 
-          {viewMode === 'reader' && (
-            <Explorer
-              moduleData={currentModule}
-              activeArticleId={activeArticle?.id || null}
-              onSelectArticle={(artId) => {
-                setActiveArticleId(artId);
-                setViewMode('reader');
-                setExplorerOpen(false);
-              }}
-              onSelectModule={(mId) => {
-                setActiveModuleId(mId);
-                setViewMode('reader');
-                setExplorerOpen(false);
-              }}
-              studiedArticleIds={progress.studiedArticleIds}
-              theme={progress.theme}
-              onCloseExplorer={() => setExplorerOpen(false)}
-            />
-          )}
+          <Explorer
+            moduleData={currentModule}
+            activeArticleId={activeArticle?.id || null}
+            onSelectArticle={(artId) => {
+              setActiveArticleId(artId);
+              setViewMode('reader');
+              setExplorerOpen(false);
+            }}
+            onSelectModule={(mId) => {
+              setActiveModuleId(mId);
+              setViewMode('reader');
+              setExplorerOpen(false);
+            }}
+            studiedArticleIds={progress.studiedArticleIds}
+            theme={progress.theme}
+            onCloseExplorer={() => setExplorerOpen(false)}
+            activeTab={activeTab}
+            onSelectTab={(tId) => {
+              handleSelectTab(tId);
+              setExplorerOpen(false);
+            }}
+          />
         </div>
 
         {/* 3. MAIN AREA: PORTAL HOME OR DIGITAL READER */}
@@ -303,6 +308,8 @@ export default function App() {
             theme={progress.theme}
             onOpenQuickFind={() => setQuickFindOpen(true)}
             onOpenStatsModal={() => setStatsModalOpen(true)}
+            activeTab={activeTab}
+            onSelectTab={(tabId) => handleSelectTab(tabId)}
           />
         ) : activeArticle ? (
           <div className="flex-1 flex flex-col overflow-hidden">

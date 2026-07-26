@@ -134,8 +134,8 @@ const calculateMetadata = (): KnowledgeBaseMetadata => {
   });
 
   return {
-    receivedDocumentsCount: 5,
-    incorporatedDocumentsCount: 5,
+    receivedDocumentsCount: ALL_MODULES.length,
+    incorporatedDocumentsCount: ALL_MODULES.length,
     pendingDocumentsCount: 0,
     discardedContentCount: 0,
     structuredChaptersCount: chaptersCount,

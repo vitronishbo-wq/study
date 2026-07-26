@@ -113,6 +113,22 @@ export const ReaderArea: React.FC<ReaderAreaProps> = ({
   // In-Article Text Search State
   const [articleSearchQuery, setArticleSearchQuery] = useState('');
   const [isArticleSearchOpen, setIsArticleSearchOpen] = useState(false);
+  const [copiedTextToast, setCopiedTextToast] = useState(false);
+
+  const handleCopyArticleText = () => {
+    const textToCopy = `ARTIGO: ${article.code} - ${article.title}\n\n` +
+      `MÓDULO: ${moduleData.title}\nCAPÍTULO: ${chapterTitle}\n` +
+      (sectionTitle ? `SECÇÃO: ${sectionTitle}\n` : '') +
+      `\n--- TEXTO LEGAL / OFICIAL ---\n${article.legalText || article.definition}\n\n` +
+      `--- EXPLICAÇÃO SIMPLES ---\n${article.simpleExplanation}\n\n` +
+      (article.importantPoints?.length ? `--- PONTOS IMPORTANTES ---\n- ${article.importantPoints.join('\n- ')}\n` : '');
+
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(textToCopy);
+      setCopiedTextToast(true);
+      setTimeout(() => setCopiedTextToast(false), 2500);
+    }
+  };
 
   // Helper to highlight search query matches in text
   const highlightMatch = (text: string) => {
@@ -840,6 +856,21 @@ export const ReaderArea: React.FC<ReaderAreaProps> = ({
                     </>
                   )}
                 </div>
+
+                {/* Recolher / Copiar Texto do Artigo */}
+                <button
+                  onClick={handleCopyArticleText}
+                  id="btn-copy-article-text"
+                  title="Recolher e Copiar Texto Completo do Artigo para Estudo"
+                  className={`px-2.5 py-1.5 rounded-lg border text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                    copiedTextToast
+                      ? 'bg-emerald-600 text-white border-emerald-600 font-bold shadow-md'
+                      : 'border-neutral-300 dark:border-neutral-800 bg-neutral-100/80 dark:bg-neutral-800 hover:bg-amber-500 hover:text-neutral-950 text-neutral-700 dark:text-neutral-200'
+                  }`}
+                >
+                  <CheckCircle2 className={`w-3.5 h-3.5 ${copiedTextToast ? 'text-white' : 'text-amber-500'}`} />
+                  <span className="hidden sm:inline">{copiedTextToast ? 'Copiado!' : 'Recolher Texto'}</span>
+                </button>
 
                 {/* DPA Quick Reference Button (Lei n.º 14/24) */}
                 <button
