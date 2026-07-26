@@ -40,7 +40,7 @@ export const getJobExpressUrl = (
   const baseUrl =
     import.meta.env.JOBEXPRESS_URL ||
     import.meta.env.VITE_JOBEXPRESS_URL ||
-    'https://jobexpress-angola.onrender.com';
+    'https://jobexpress-angola-s12y.onrender.com';
 
   try {
     const url = new URL(baseUrl);
